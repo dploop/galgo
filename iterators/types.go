@@ -2,4 +2,4 @@ package iterators
 
 type Data = interface{}
 
-type Diff = int
+type Size = int

@@ -7,7 +7,7 @@ import (
 type RandomAccessIterator interface {
 	BidirectionalIterator
 	basics.LessThanComparable
-	At(diff Diff) Data
-	Advance(diff Diff)
-	Distance(other RandomAccessIterator) Diff
+	At(diff Size) Data
+	Advance(diff Size)
+	Distance(other RandomAccessIterator) Size
 }
