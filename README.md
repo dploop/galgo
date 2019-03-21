@@ -1,2 +1,2 @@
-# galgo
-A Golang Algorithm Library
+# A Golang Algorithm Library
+
