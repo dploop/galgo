@@ -101,9 +101,9 @@ func TestList_PopFront(t *testing.T) {
 
 func BenchmarkList_PopFront(b *testing.B) {
 	loop := 1000000
-	nodes := make([]*Node, loop)
+	nodes := make([]*node, loop)
 	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
+		nodes[k] = &node{}
 	}
 	l := NewList()
 	for n := 0; n < b.N; n++ {
@@ -112,7 +112,7 @@ func BenchmarkList_PopFront(b *testing.B) {
 			for k := 1; k < loop; k++ {
 				nodes[k - 1].next = nodes[k]
 			}
-			l.sent.next = nodes[0]
+			l.sent().next = nodes[0]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -138,15 +138,14 @@ func BenchmarkList_Clear(b *testing.B) {
 
 func TestList_Begin(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
 	begin := l.Begin()
-	if begin.p != sent {
-		t.Errorf("begin.p(%p) != sent(%p)", begin.p, sent)
+	if begin.node != nil {
+		t.Errorf("begin.node(%p) != nil", begin.node)
 	}
 	l.PushFront(42)
 	begin = l.Begin()
-	if begin.p == sent {
-		t.Errorf("begin.p(%p) == sent(%p)", begin.p, sent)
+	if begin.node == nil {
+		t.Errorf("begin.node(%p) == nil", begin.node)
 	}
 }
 
@@ -159,15 +158,14 @@ func BenchmarkList_Begin(b *testing.B) {
 
 func TestList_End(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
 	end := l.End()
-	if end.p != sent {
-		t.Errorf("end.p(%p) != sent(%p)", end.p, sent)
+	if end.node != nil {
+		t.Errorf("end.node(%p) != nil", end.node)
 	}
 	l.PushFront(42)
 	end = l.End()
-	if end.p != sent {
-		t.Errorf("end.p(%p) != sent(%p)", end.p, sent)
+	if end.node != nil {
+		t.Errorf("end.node(%p) != nil", end.node)
 	}
 }
 
@@ -184,17 +182,17 @@ func TestList_InsertAfter(t *testing.T) {
 	i := l.Begin()
 	j := l.InsertAfter(i, 2)
 	k := l.InsertAfter(j, 3)
-	datai := i.Read().(int)
-	if datai != 1 {
-		t.Errorf("datai(%v) != 1", datai)
+	di := i.Read().(int)
+	if di != 1 {
+		t.Errorf("di(%v) != 1", di)
 	}
-	dataj := j.Read().(int)
-	if dataj != 2 {
-		t.Errorf("dataj(%v) != 2", dataj)
+	dj := j.Read().(int)
+	if dj != 2 {
+		t.Errorf("dj(%v) != 2", dj)
 	}
-	datak := k.Read().(int)
-	if datak != 3 {
-		t.Errorf("datak(%v) != 1", datak)
+	dk := k.Read().(int)
+	if dk != 3 {
+		t.Errorf("dk(%v) != 1", dk)
 	}
 }
 
@@ -230,20 +228,17 @@ func TestList_EraseAfter(t *testing.T) {
 }
 
 func BenchmarkList_EraseAfter(b *testing.B) {
-	loop := 1000000
-	nodes := make([]*Node, loop)
-	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
-	}
+	const loop = 1000000
+	var nodes [loop]node
 	l := NewList()
 	i := l.Begin()
 	for n := 0; n < b.N; n++ {
 		if l.size <= 1 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
+				nodes[k - 1].next = &nodes[k]
 			}
-			l.sent.next = nodes[0]
+			l.sent().next = &nodes[0]
 			l.size = loop
 			i = l.Begin()
 			b.StartTimer()

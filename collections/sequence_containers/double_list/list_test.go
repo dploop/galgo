@@ -100,23 +100,20 @@ func TestList_PopFront(t *testing.T) {
 }
 
 func BenchmarkList_PopFront(b *testing.B) {
-	loop := 1000000
-	nodes := make([]*Node, loop)
-	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
-	}
+	const loop = 1000000
+	var nodes [loop]node
 	l := NewList()
 	for n := 0; n < b.N; n++ {
 		if l.size == 0 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
-				nodes[k].prev = nodes[k - 1]
+				nodes[k - 1].next = &nodes[k]
+				nodes[k].prev = &nodes[k - 1]
 			}
-			l.sent.next = nodes[0]
-			nodes[0].prev = &l.sent
-			l.sent.prev = nodes[loop - 1]
-			nodes[loop - 1].next = &l.sent
+			l.sent().next = &nodes[0]
+			nodes[0].prev = l.sent()
+			l.sent().prev = &nodes[loop - 1]
+			nodes[loop - 1].next = l.sent()
 			l.size = loop
 			b.StartTimer()
 		}
@@ -171,23 +168,20 @@ func TestList_PopBack(t *testing.T) {
 }
 
 func BenchmarkList_PopBack(b *testing.B) {
-	loop := 1000000
-	nodes := make([]*Node, loop)
-	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
-	}
+	const loop = 1000000
+	var nodes [loop]node
 	l := NewList()
 	for n := 0; n < b.N; n++ {
 		if l.size == 0 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
-				nodes[k].prev = nodes[k - 1]
+				nodes[k - 1].next = &nodes[k]
+				nodes[k].prev = &nodes[k - 1]
 			}
-			nodes[0].prev = &l.sent
-			l.sent.next = nodes[0]
-			nodes[loop - 1].next = &l.sent
-			l.sent.prev = nodes[loop - 1]
+			nodes[0].prev = l.sent()
+			l.sent().next = &nodes[0]
+			nodes[loop - 1].next = l.sent()
+			l.sent().prev = &nodes[loop - 1]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -213,15 +207,15 @@ func BenchmarkList_Clear(b *testing.B) {
 
 func TestList_Begin(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
+	s := l.sent()
 	begin := l.Begin()
-	if begin.p != sent {
-		t.Errorf("begin.p(%p) != sent(%p)", begin.p, sent)
+	if begin.node != s {
+		t.Errorf("begin.node(%p) != s(%p)", begin.node, s)
 	}
 	l.PushFront(42)
 	begin = l.Begin()
-	if begin.p == sent {
-		t.Errorf("begin.p(%p) == sent(%p)", begin.p, sent)
+	if begin.node == s {
+		t.Errorf("begin.node(%p) == s(%p)", begin.node, s)
 	}
 }
 
@@ -234,15 +228,15 @@ func BenchmarkList_Begin(b *testing.B) {
 
 func TestList_End(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
+	s := l.sent()
 	end := l.End()
-	if end.p != sent {
-		t.Errorf("end.p(%p) != sent(%p)", end.p, sent)
+	if end.node != s {
+		t.Errorf("end.node(%p) != s(%p)", end.node, s)
 	}
 	l.PushFront(42)
 	end = l.End()
-	if end.p != sent {
-		t.Errorf("end.p(%p) != sent(%p)", end.p, sent)
+	if end.node != s {
+		t.Errorf("end.node(%p) != s(%p)", end.node, s)
 	}
 }
 
@@ -255,15 +249,15 @@ func BenchmarkList_End(b *testing.B) {
 
 func TestList_ReverseBegin(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
+	s := l.sent()
 	rbegin := l.ReverseBegin()
-	if rbegin.p != sent {
-		t.Errorf("rbegin.p(%p) != sent(%p)", rbegin.p, sent)
+	if rbegin.node != s {
+		t.Errorf("rbegin.node(%p) != s(%p)", rbegin.node, s)
 	}
 	l.PushBack(42)
 	rbegin = l.ReverseBegin()
-	if rbegin.p == sent {
-		t.Errorf("rbegin.p(%p) == sent(%p)", rbegin.p, sent)
+	if rbegin.node == s {
+		t.Errorf("rbegin.node(%p) == s(%p)", rbegin.node, s)
 	}
 }
 
@@ -276,15 +270,15 @@ func BenchmarkList_ReverseBegin(b *testing.B) {
 
 func TestList_ReverseEnd(t *testing.T) {
 	l := NewList()
-	sent := &l.sent
+	s := l.sent()
 	rend := l.ReverseEnd()
-	if rend.p != sent {
-		t.Errorf("rend.p(%p) != sent(%p)", rend.p, sent)
+	if rend.node != s {
+		t.Errorf("rend.node(%p) != s(%p)", rend.node, s)
 	}
 	l.PushBack(42)
 	rend = l.ReverseEnd()
-	if rend.p != sent {
-		t.Errorf("rend.p(%p) != sent(%p)", rend.p, sent)
+	if rend.node != s {
+		t.Errorf("rend.node(%p) != s(%p)", rend.node, s)
 	}
 }
 
@@ -295,27 +289,27 @@ func BenchmarkList_ReverseEnd(b *testing.B) {
 	}
 }
 
-func TestList_InsertBefore(t *testing.T) {
+func TestList_Insert(t *testing.T) {
 	l := NewList()
 	l.PushBack(1)
 	i := l.ReverseBegin()
-	j := l.InsertBefore(i, 2)
-	k := l.InsertBefore(j, 3)
-	datai := i.Read().(int)
-	if datai != 1 {
-		t.Errorf("datai(%v) != 1", datai)
+	j := l.Insert(i, 2)
+	k := l.Insert(j, 3)
+	di := i.Read().(int)
+	if di != 1 {
+		t.Errorf("di(%v) != 1", di)
 	}
-	dataj := j.Read().(int)
-	if dataj != 2 {
-		t.Errorf("dataj(%v) != 2", dataj)
+	dj := j.Read().(int)
+	if dj != 2 {
+		t.Errorf("dj(%v) != 2", dj)
 	}
-	datak := k.Read().(int)
-	if datak != 3 {
-		t.Errorf("datak(%v) != 1", datak)
+	dk := k.Read().(int)
+	if dk != 3 {
+		t.Errorf("dk(%v) != 1", dk)
 	}
 }
 
-func BenchmarkList_InsertBefore(b *testing.B) {
+func BenchmarkList_Insert(b *testing.B) {
 	loop := 1000000
 	l := NewList()
 	l.PushBack(42)
@@ -326,128 +320,46 @@ func BenchmarkList_InsertBefore(b *testing.B) {
 			l.PushBack(42)
 			i = l.ReverseBegin()
 		}
-		_ = l.InsertBefore(i, 42)
+		_ = l.Insert(i, 42)
 	}
 }
 
-func TestList_InsertAfter(t *testing.T) {
-	l := NewList()
-	l.PushFront(1)
-	i := l.Begin()
-	j := l.InsertAfter(i, 2)
-	k := l.InsertAfter(j, 3)
-	datai := i.Read().(int)
-	if datai != 1 {
-		t.Errorf("datai(%v) != 1", datai)
-	}
-	dataj := j.Read().(int)
-	if dataj != 2 {
-		t.Errorf("dataj(%v) != 2", dataj)
-	}
-	datak := k.Read().(int)
-	if datak != 3 {
-		t.Errorf("datak(%v) != 1", datak)
-	}
-}
-
-func BenchmarkList_InsertAfter(b *testing.B) {
-	loop := 1000000
-	l := NewList()
-	l.PushFront(42)
-	i := l.Begin()
-	for n := 0; n < b.N; n++ {
-		if l.size == loop {
-			l.Clear()
-			l.PushFront(42)
-			i = l.Begin()
-		}
-		_ = l.InsertAfter(i, 42)
-	}
-}
-
-func TestList_EraseBefore(t *testing.T) {
+func TestList_Erase(t *testing.T) {
 	l := NewList()
 	l.PushBack(3)
 	l.PushBack(2)
 	l.PushBack(1)
 	i := l.ReverseBegin()
-	_ = l.EraseBefore(i)
+	_ = l.Erase(i)
 	if l.Size() != 2 {
 		t.Errorf("l(%v) is not 2 sized", l)
 	}
-	_ = l.EraseBefore(i)
+	_ = l.Erase(i)
 	if l.Size() != 1 {
 		t.Errorf("l(%v) is not 1 sized", l)
 	}
 }
 
-func BenchmarkList_EraseBefore(b *testing.B) {
-	loop := 1000000
-	nodes := make([]*Node, loop)
-	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
-	}
+func BenchmarkList_Erase(b *testing.B) {
+	const loop = 1000000
+	var nodes [loop]node
 	l := NewList()
 	i := l.ReverseBegin()
 	for n := 0; n < b.N; n++ {
 		if l.size <= 1 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
-				nodes[k].prev = nodes[k - 1]
+				nodes[k - 1].next = &nodes[k]
+				nodes[k].prev = &nodes[k - 1]
 			}
-			nodes[loop - 1].next = &l.sent
-			l.sent.prev = nodes[loop - 1]
-			nodes[0].prev = &l.sent
-			l.sent.next = nodes[0]
+			nodes[loop - 1].next = l.sent()
+			l.sent().prev = &nodes[loop - 1]
+			nodes[0].prev = l.sent()
+			l.sent().next = &nodes[0]
 			l.size = loop
 			i = l.ReverseBegin()
 			b.StartTimer()
 		}
-		_ = l.EraseBefore(i)
-	}
-}
-
-
-func TestList_EraseAfter(t *testing.T) {
-	l := NewList()
-	l.PushFront(3)
-	l.PushFront(2)
-	l.PushFront(1)
-	i := l.Begin()
-	_ = l.EraseAfter(i)
-	if l.Size() != 2 {
-		t.Errorf("l(%v) is not 2 sized", l)
-	}
-	_ = l.EraseAfter(i)
-	if l.Size() != 1 {
-		t.Errorf("l(%v) is not 1 sized", l)
-	}
-}
-
-func BenchmarkList_EraseAfter(b *testing.B) {
-	loop := 1000000
-	nodes := make([]*Node, loop)
-	for k := 0; k < loop; k++ {
-		nodes[k] = &Node{}
-	}
-	l := NewList()
-	i := l.Begin()
-	for n := 0; n < b.N; n++ {
-		if l.size <= 1 {
-			b.StopTimer()
-			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
-				nodes[k].prev = nodes[k - 1]
-			}
-			nodes[loop - 1].next = &l.sent
-			l.sent.prev = nodes[loop - 1]
-			nodes[0].prev = &l.sent
-			l.sent.next = nodes[0]
-			l.size = loop
-			i = l.Begin()
-			b.StartTimer()
-		}
-		_ = l.EraseAfter(i)
+		_ = l.Erase(i)
 	}
 }

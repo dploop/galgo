@@ -1,27 +1,40 @@
 package double_list
 
+import (
+	"unsafe"
+)
+
 type List struct {
-	sent Node
+	prev *node
+	next *node
 	size Size
 }
 
-type Node struct {
+type node struct {
+	prev *node
+	next *node
 	data Data
-	prev *Node
-	next *Node
+}
+
+func (l *List) sent() *node {
+	return (*node)(unsafe.Pointer(l))
+}
+
+func (l *List) assert(p *node) {
+	if p == l.sent() {
+		_ = *(*node)(nil)
+	}
 }
 
 func NewList() *List {
 	l := &List{}
-	sent := &l.sent
-	sent.prev = sent
-	sent.next = sent
+	s := l.sent()
+	s.prev, s.next = s, s
 	return l
 }
 
 func (l *List) Empty() bool {
-	sent := &l.sent
-	return sent.next == sent
+	return l.size == 0
 }
 
 func (l *List) Size() Size {
@@ -29,113 +42,85 @@ func (l *List) Size() Size {
 }
 
 func (l *List) PushFront(data Data) {
-	sent := &l.sent
-	node := &Node{data: data, prev: sent, next: sent.next}
-	node.prev.next, node.next.prev = node, node
+	p := &node{data: data}
+	l.link(l.sent().next, p, p)
 	l.size++
 }
 
 func (l *List) Front() Data {
-	sent := &l.sent
-	return sent.next.data
+	return l.sent().next.data
 }
 
 func (l *List) PopFront() {
-	sent := &l.sent
-	node := sent.next
-	if node == sent {
-		panic("no such element")
-	}
-	node.prev.next = node.next
-	node.next.prev = node.prev
+	p := l.sent().next
+	l.assert(p)
+	l.unlink(p, p)
 	l.size--
 }
 
 func (l *List) PushBack(data Data) {
-	sent := &l.sent
-	node := &Node{data: data}
-	node.prev = sent.prev
-	sent.prev.next = node
-	node.next = sent
-	sent.prev = node
+	p := &node{data: data}
+	l.link(l.sent(), p, p)
 	l.size++
 }
 
 func (l *List) Back() Data {
-	sent := &l.sent
-	return sent.prev.data
+	return l.sent().prev.data
 }
 
 func (l *List) PopBack() {
-	sent := &l.sent
-	node := sent.prev
-	if node == sent {
-		panic("no such element")
-	}
-	node.prev.next = node.next
-	node.next.prev = node.prev
+	p := l.sent().prev
+	l.assert(p)
+	l.unlink(p, p)
 	l.size--
 }
 
 func (l *List) Clear() {
-	sent := &l.sent
-	sent.prev = sent
-	sent.next = sent
+	s := l.sent()
+	s.prev, s.next = s, s
 	l.size = 0
 }
 
 func (l *List) Begin() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent.next}
+	return Iterator{l.sent().next}
 }
 
 func (l *List) End() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent}
+	return Iterator{l.sent()}
 }
 
 func (l *List) ReverseBegin() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent.prev}
+	return Iterator{l.sent().prev}
 }
 
 func (l *List) ReverseEnd() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent}
+	return Iterator{l.sent()}
 }
 
-func (l *List) InsertBefore(i Iterator, data Data) Iterator {
-	node := &Node{data: data, prev: i.p.prev, next: i.p}
-	node.prev.next, node.next.prev = node, node
+func (l *List) Insert(i Iterator, data Data) Iterator {
+	p := &node{data: data}
+	l.link(i.node, p, p)
 	l.size++
-	return Iterator{p: node}
+	return Iterator{p}
 }
 
-func (l *List) InsertAfter(i Iterator, data Data) Iterator {
-	node := &Node{data: data, prev: i.p, next: i.p.next}
-	node.prev.next, node.next.prev = node, node
-	l.size++
-	return Iterator{p: node}
-}
-
-func (l *List) EraseBefore(i Iterator) Iterator {
-	node := i.p.prev
-	if node == i.p {
-		panic("invalid iterator")
-	}
-	node.prev.next = node.next
-	node.next.prev = node.prev
+func (l *List) Erase(i Iterator) Iterator {
+	p := i.node
+	l.assert(p)
+	r := p.next
+	l.unlink(p, p)
 	l.size--
-	return Iterator{p: i.p.prev}
+	return Iterator{r}
 }
 
-func (l *List) EraseAfter(i Iterator) Iterator {
-	node := i.p.next
-	if node == i.p {
-		panic("invalid iterator")
-	}
-	node.prev.next = node.next
-	node.next.prev = node.prev
-	l.size--
-	return Iterator{p: i.p.next}
+func (l *List) link(p, head, tail *node) {
+	p.prev.next = head
+	head.prev = p.prev
+	p.prev = tail
+	tail.next = p
+}
+
+func (l *List) unlink(head, tail *node) {
+	head.prev.next = tail.next
+	tail.next.prev = head.prev
 }

@@ -5,43 +5,43 @@ import (
 )
 
 func TestIterator_Clone(t *testing.T) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	j := i.Clone().(Iterator)
 	if &i == &j {
 		t.Errorf("&i(%p) == &j(%p)", i, j)
 	}
-	if i.p != j.p {
-		t.Errorf("i.p(%p) != j.p(%p)", i.p, j.p)
+	if i.node != j.node {
+		t.Errorf("i.node(%p) != j.node(%p)", i.node, j.node)
 	}
 }
 
 func BenchmarkIterator_Clone(b *testing.B) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		_ = i.Clone()
 	}
 }
 
 func TestIterator_ImplClone(t *testing.T) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	j := i.ImplClone()
 	if &i == &j {
 		t.Errorf("&i(%p) == &j(%p)", i, j)
 	}
-	if i.p != j.p {
-		t.Errorf("i.p(%p) != j.p(%p)", i.p, j.p)
+	if i.node != j.node {
+		t.Errorf("i.node(%p) != j.node(%p)", i.node, j.node)
 	}
 }
 
 func BenchmarkIterator_ImplClone(b *testing.B) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		_ = i.ImplClone()
 	}
 }
 
 func TestIterator_Read(t *testing.T) {
-	i := Iterator{p: &Node{data: 42}}
+	i := Iterator{&node{data: 42}}
 	data := i.Read().(int)
 	if data != 42 {
 		t.Errorf("data(%v) != 42", data)
@@ -49,14 +49,14 @@ func TestIterator_Read(t *testing.T) {
 }
 
 func BenchmarkIterator_Read(b *testing.B) {
-	i := Iterator{p: &Node{data: 42}}
+	i := Iterator{&node{data: 42}}
 	for n := 0; n < b.N; n++ {
 		_ = i.Read()
 	}
 }
 
 func TestIterator_ImplRead(t *testing.T) {
-	i := Iterator{p: &Node{data: 42}}
+	i := Iterator{&node{data: 42}}
 	data := i.ImplRead().(int)
 	if data != 42 {
 		t.Errorf("data(%v) != 42", data)
@@ -64,43 +64,43 @@ func TestIterator_ImplRead(t *testing.T) {
 }
 
 func BenchmarkIterator_ImplRead(b *testing.B) {
-	i := Iterator{p: &Node{data: 42}}
+	i := Iterator{&node{data: 42}}
 	for n := 0; n < b.N; n++ {
 		_ = i.ImplRead()
 	}
 }
 
 func TestIterator_Next(t *testing.T) {
-	next := &Node{}
-	i := Iterator{p: &Node{next: next}}
+	next := &node{}
+	i := Iterator{&node{next: next}}
 	i.Next()
-	if i.p != next {
-		t.Errorf("i.p(%p) != next(%p)", i.p, next)
+	if i.node != next {
+		t.Errorf("i.node(%p) != next(%p)", i.node, next)
 	}
 }
 
 func BenchmarkIterator_Next(b *testing.B) {
-	next := &Node{}
-	i := Iterator{p: &Node{next: next}}
-	i.p.next.next = i.p.next
+	next := &node{}
+	i := Iterator{&node{next: next}}
+	i.next.next = i.next
 	for n := 0; n < b.N; n++ {
 		i.Next()
 	}
 }
 
 func TestIterator_Prev(t *testing.T) {
-	prev := &Node{}
-	i := Iterator{p: &Node{prev: prev}}
+	prev := &node{}
+	i := Iterator{&node{prev: prev}}
 	i.Prev()
-	if i.p != prev {
-		t.Errorf("i.p(%p) != prev(%p)", i.p, prev)
+	if i.node != prev {
+		t.Errorf("i.node(%p) != prev(%p)", i.node, prev)
 	}
 }
 
 func BenchmarkIterator_Prev(b *testing.B) {
-	prev := &Node{}
-	i := Iterator{p: &Node{prev: prev}}
-	i.p.prev.prev = i.p.prev
+	prev := &node{}
+	i := Iterator{&node{prev: prev}}
+	i.prev.prev = i.prev
 	for n := 0; n < b.N; n++ {
 		i.Prev()
 	}
@@ -108,72 +108,72 @@ func BenchmarkIterator_Prev(b *testing.B) {
 
 
 func TestIterator_Equal(t *testing.T) {
-	i := Iterator{p: &Node{}}
-	j := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
+	j := Iterator{&node{}}
 	if i.Equal(j) {
 		t.Errorf("i(%v) == j(%v)", i, j)
 	}
-	i.p = j.p
+	i.node = j.node
 	if !i.Equal(j) {
 		t.Errorf("i(%v) != j(%v)", i, j)
 	}
 }
 
 func BenchmarkIterator_Equal(b *testing.B) {
-	i := Iterator{p: &Node{}}
-	j := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
+	j := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		_ = i.Equal(j)
 	}
 }
 
 func TestIterator_ImplEqual(t *testing.T) {
-	i := Iterator{p: &Node{}}
-	j := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
+	j := Iterator{&node{}}
 	if i.ImplEqual(j) {
 		t.Errorf("i(%v) == j(%v)", i, j)
 	}
-	i.p = j.p
+	i.node = j.node
 	if !i.ImplEqual(j) {
 		t.Errorf("i(%v) != j(%v)", i, j)
 	}
 }
 
 func BenchmarkIterator_ImplEqual(b *testing.B) {
-	i := Iterator{p: &Node{}}
-	j := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
+	j := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		_ = i.ImplEqual(j)
 	}
 }
 
 func TestIterator_Write(t *testing.T) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	i.Write(42)
-	data := i.p.data.(int)
+	data := i.data.(int)
 	if data != 42 {
 		t.Errorf("data(%v) != 42", data)
 	}
 }
 
 func BenchmarkIterator_Write(b *testing.B) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		i.Write(42)
 	}
 }
 
 func TestIterator_ImplWrite(t *testing.T) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	i.ImplWrite(42)
-	data := i.p.data.(int)
+	data := i.data.(int)
 	if data != 42 {
 		t.Errorf("data(%v) != 42", data)
 	}
 }
 
 func BenchmarkIterator_ImplWrite(b *testing.B) {
-	i := Iterator{p: &Node{}}
+	i := Iterator{&node{}}
 	for n := 0; n < b.N; n++ {
 		i.ImplWrite(42)
 	}

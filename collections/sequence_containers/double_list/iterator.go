@@ -8,7 +8,7 @@ import (
 var _ iterators.MutableBidirectionalIterator = (*Iterator)(nil)
 
 type Iterator struct {
-	p *Node
+	*node
 }
 
 func (i Iterator) Clone() basics.Cloneable {
@@ -16,7 +16,7 @@ func (i Iterator) Clone() basics.Cloneable {
 }
 
 func (i Iterator) ImplClone() Iterator {
-	return Iterator{p: i.p}
+	return i
 }
 
 func (i Iterator) Read() iterators.Data {
@@ -24,15 +24,15 @@ func (i Iterator) Read() iterators.Data {
 }
 
 func (i Iterator) ImplRead() Data {
-	return i.p.data
+	return i.data
 }
 
 func (i *Iterator) Next() {
-	i.p = i.p.next
+	i.node = i.next
 }
 
 func (i *Iterator) Prev() {
-	i.p = i.p.prev
+	i.node = i.prev
 }
 
 func (i Iterator) Equal(other basics.EqualityComparable) bool {
@@ -40,7 +40,7 @@ func (i Iterator) Equal(other basics.EqualityComparable) bool {
 }
 
 func (i Iterator) ImplEqual(other Iterator) bool {
-	return i.p == other.p
+	return i == other
 }
 
 func (i Iterator) Write(data iterators.Data) {
@@ -48,5 +48,5 @@ func (i Iterator) Write(data iterators.Data) {
 }
 
 func (i Iterator) ImplWrite(data Data) {
-	i.p.data = data
+	i.data = data
 }

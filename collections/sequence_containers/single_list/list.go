@@ -1,25 +1,29 @@
 package single_list
 
+import (
+	"unsafe"
+)
+
 type List struct {
-	sent Node
+	next *node
 	size Size
 }
 
-type Node struct {
+type node struct {
+	next *node
 	data Data
-	next *Node
+}
+
+func (l *List) sent() *node {
+	return (*node)(unsafe.Pointer(l))
 }
 
 func NewList() *List {
-	l := &List{size: 0}
-	sent := &l.sent
-	sent.next = sent
-	return l
+	return &List{}
 }
 
 func (l *List) Empty() bool {
-	sent := &l.sent
-	return sent.next == sent
+	return l.size == 0
 }
 
 func (l *List) Size() Size {
@@ -27,56 +31,42 @@ func (l *List) Size() Size {
 }
 
 func (l *List) PushFront(data Data) {
-	sent := &l.sent
-	node := &Node{data: data, next: sent.next}
-	sent.next = node
+	s := l.sent()
+	s.next = &node{next: s.next, data: data}
 	l.size++
 }
 
 func (l *List) Front() Data {
-	sent := &l.sent
-	return sent.next.data
+	return l.sent().next.data
 }
 
 func (l *List) PopFront() {
-	sent := &l.sent
-	node := sent.next
-	if node == sent {
-		panic("no such element")
-	}
-	sent.next = node.next
+	s := l.sent()
+	s.next = s.next.next
 	l.size--
 }
 
 func (l *List) Clear() {
-	sent := &l.sent
-	sent.next = sent
+	l.sent().next = nil
 	l.size = 0
 }
 
 func (l *List) Begin() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent.next}
+	return Iterator{l.sent().next}
 }
 
 func (l *List) End() Iterator {
-	sent := &l.sent
-	return Iterator{p: sent}
+	return Iterator{}
 }
 
 func (l *List) InsertAfter(i Iterator, data Data) Iterator {
-	node := &Node{data: data, next: i.p.next}
-	i.p.next = node
+	i.next = &node{next: i.next, data: data}
 	l.size++
-	return Iterator{p: i.p.next}
+	return Iterator{i.next}
 }
 
 func (l *List) EraseAfter(i Iterator) Iterator {
-	node := i.p.next
-	if node == i.p {
-		panic("invalid iterator")
-	}
-	i.p.next = node.next
+	i.next = i.next.next
 	l.size--
-	return Iterator{p: i.p.next}
+	return Iterator{i.next}
 }
