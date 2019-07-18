@@ -1,19 +1,21 @@
-package double_list
+package doubly
 
 import (
 	"unsafe"
+
+	"github.com/dploop/gostl/types"
 )
 
 type List struct {
 	prev *node
 	next *node
-	size Size
+	size types.Size
 }
 
 type node struct {
 	prev *node
 	next *node
-	data Data
+	data types.Data
 }
 
 func (l *List) sent() *node {
@@ -33,21 +35,21 @@ func NewList() *List {
 	return l
 }
 
-func (l *List) Empty() bool {
-	return l.size == 0
-}
-
-func (l *List) Size() Size {
+func (l *List) Size() types.Size {
 	return l.size
 }
 
-func (l *List) PushFront(data Data) {
+func (l *List) Empty() bool {
+	return l.Size() == 0
+}
+
+func (l *List) PushFront(data types.Data) {
 	p := &node{data: data}
 	l.link(l.sent().next, p, p)
 	l.size++
 }
 
-func (l *List) Front() Data {
+func (l *List) Front() types.Data {
 	return l.sent().next.data
 }
 
@@ -58,13 +60,13 @@ func (l *List) PopFront() {
 	l.size--
 }
 
-func (l *List) PushBack(data Data) {
+func (l *List) PushBack(data types.Data) {
 	p := &node{data: data}
 	l.link(l.sent(), p, p)
 	l.size++
 }
 
-func (l *List) Back() Data {
+func (l *List) Back() types.Data {
 	return l.sent().prev.data
 }
 
@@ -82,35 +84,35 @@ func (l *List) Clear() {
 }
 
 func (l *List) Begin() Iterator {
-	return Iterator{l.sent().next}
+	return Iterator{n: l.sent().next}
 }
 
 func (l *List) End() Iterator {
-	return Iterator{l.sent()}
+	return Iterator{n: l.sent()}
 }
 
 func (l *List) ReverseBegin() Iterator {
-	return Iterator{l.sent().prev}
+	return Iterator{n: l.sent().prev}
 }
 
 func (l *List) ReverseEnd() Iterator {
-	return Iterator{l.sent()}
+	return Iterator{n: l.sent()}
 }
 
-func (l *List) Insert(i Iterator, data Data) Iterator {
+func (l *List) Insert(i Iterator, data types.Data) Iterator {
 	p := &node{data: data}
-	l.link(i.node, p, p)
+	l.link(i.n, p, p)
 	l.size++
-	return Iterator{p}
+	return Iterator{n: p}
 }
 
 func (l *List) Erase(i Iterator) Iterator {
-	p := i.node
+	p := i.n
 	l.assert(p)
 	r := p.next
 	l.unlink(p, p)
 	l.size--
-	return Iterator{r}
+	return Iterator{n: r}
 }
 
 func (l *List) link(p, head, tail *node) {

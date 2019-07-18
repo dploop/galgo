@@ -1,10 +1,11 @@
 package iterators
 
 import (
-	"github.com/dploop/galgo/basics"
+	"github.com/dploop/gostl/traits"
 )
 
 type InputIterator interface {
 	Iterator
-	basics.EqualityComparable
+	traits.EqualityComparable
+	traits.Readable
 }

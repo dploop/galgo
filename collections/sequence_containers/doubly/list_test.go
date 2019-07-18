@@ -1,4 +1,4 @@
-package double_list
+package doubly
 
 import (
 	"testing"
@@ -17,24 +17,6 @@ func BenchmarkNewList(b *testing.B) {
 	}
 }
 
-func TestList_Empty(t *testing.T) {
-	l := NewList()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
-	l.PushFront(42)
-	if l.Empty() {
-		t.Errorf("l(%v) is empty", l)
-	}
-}
-
-func BenchmarkList_Empty(b *testing.B) {
-	l := NewList()
-	for n := 0; n < b.N; n++ {
-		_ = l.Empty()
-	}
-}
-
 func TestList_Size(t *testing.T) {
 	l := NewList()
 	if l.Size() != 0 {
@@ -50,6 +32,24 @@ func BenchmarkList_Size(b *testing.B) {
 	l := NewList()
 	for n := 0; n < b.N; n++ {
 		_ = l.Size()
+	}
+}
+
+func TestList_Empty(t *testing.T) {
+	l := NewList()
+	if !l.Empty() {
+		t.Errorf("l(%v) is not empty", l)
+	}
+	l.PushFront(42)
+	if l.Empty() {
+		t.Errorf("l(%v) is empty", l)
+	}
+}
+
+func BenchmarkList_Empty(b *testing.B) {
+	l := NewList()
+	for n := 0; n < b.N; n++ {
+		_ = l.Empty()
 	}
 }
 
@@ -91,12 +91,18 @@ func BenchmarkList_Front(b *testing.B) {
 }
 
 func TestList_PopFront(t *testing.T) {
+	defer func() {
+		if err := recover(); err == nil {
+			t.Errorf("failed to panic")
+		}
+	}()
 	l := NewList()
 	l.PushFront(42)
 	l.PopFront()
 	if !l.Empty() {
 		t.Errorf("l(%v) is not empty", l)
 	}
+	l.PopFront()
 }
 
 func BenchmarkList_PopFront(b *testing.B) {
@@ -107,13 +113,13 @@ func BenchmarkList_PopFront(b *testing.B) {
 		if l.size == 0 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = &nodes[k]
-				nodes[k].prev = &nodes[k - 1]
+				nodes[k-1].next = &nodes[k]
+				nodes[k].prev = &nodes[k-1]
 			}
 			l.sent().next = &nodes[0]
 			nodes[0].prev = l.sent()
-			l.sent().prev = &nodes[loop - 1]
-			nodes[loop - 1].next = l.sent()
+			l.sent().prev = &nodes[loop-1]
+			nodes[loop-1].next = l.sent()
 			l.size = loop
 			b.StartTimer()
 		}
@@ -175,13 +181,13 @@ func BenchmarkList_PopBack(b *testing.B) {
 		if l.size == 0 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = &nodes[k]
-				nodes[k].prev = &nodes[k - 1]
+				nodes[k-1].next = &nodes[k]
+				nodes[k].prev = &nodes[k-1]
 			}
 			nodes[0].prev = l.sent()
 			l.sent().next = &nodes[0]
-			nodes[loop - 1].next = l.sent()
-			l.sent().prev = &nodes[loop - 1]
+			nodes[loop-1].next = l.sent()
+			l.sent().prev = &nodes[loop-1]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -209,13 +215,13 @@ func TestList_Begin(t *testing.T) {
 	l := NewList()
 	s := l.sent()
 	begin := l.Begin()
-	if begin.node != s {
-		t.Errorf("begin.node(%p) != s(%p)", begin.node, s)
+	if begin.n != s {
+		t.Errorf("begin.n(%p) != s(%p)", begin.n, s)
 	}
 	l.PushFront(42)
 	begin = l.Begin()
-	if begin.node == s {
-		t.Errorf("begin.node(%p) == s(%p)", begin.node, s)
+	if begin.n == s {
+		t.Errorf("begin.n(%p) == s(%p)", begin.n, s)
 	}
 }
 
@@ -230,13 +236,13 @@ func TestList_End(t *testing.T) {
 	l := NewList()
 	s := l.sent()
 	end := l.End()
-	if end.node != s {
-		t.Errorf("end.node(%p) != s(%p)", end.node, s)
+	if end.n != s {
+		t.Errorf("end.n(%p) != s(%p)", end.n, s)
 	}
 	l.PushFront(42)
 	end = l.End()
-	if end.node != s {
-		t.Errorf("end.node(%p) != s(%p)", end.node, s)
+	if end.n != s {
+		t.Errorf("end.n(%p) != s(%p)", end.n, s)
 	}
 }
 
@@ -251,13 +257,13 @@ func TestList_ReverseBegin(t *testing.T) {
 	l := NewList()
 	s := l.sent()
 	rbegin := l.ReverseBegin()
-	if rbegin.node != s {
-		t.Errorf("rbegin.node(%p) != s(%p)", rbegin.node, s)
+	if rbegin.n != s {
+		t.Errorf("rbegin.n(%p) != s(%p)", rbegin.n, s)
 	}
 	l.PushBack(42)
 	rbegin = l.ReverseBegin()
-	if rbegin.node == s {
-		t.Errorf("rbegin.node(%p) == s(%p)", rbegin.node, s)
+	if rbegin.n == s {
+		t.Errorf("rbegin.n(%p) == s(%p)", rbegin.n, s)
 	}
 }
 
@@ -272,13 +278,13 @@ func TestList_ReverseEnd(t *testing.T) {
 	l := NewList()
 	s := l.sent()
 	rend := l.ReverseEnd()
-	if rend.node != s {
-		t.Errorf("rend.node(%p) != s(%p)", rend.node, s)
+	if rend.n != s {
+		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
 	}
 	l.PushBack(42)
 	rend = l.ReverseEnd()
-	if rend.node != s {
-		t.Errorf("rend.node(%p) != s(%p)", rend.node, s)
+	if rend.n != s {
+		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
 	}
 }
 
@@ -349,11 +355,11 @@ func BenchmarkList_Erase(b *testing.B) {
 		if l.size <= 1 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = &nodes[k]
-				nodes[k].prev = &nodes[k - 1]
+				nodes[k-1].next = &nodes[k]
+				nodes[k].prev = &nodes[k-1]
 			}
-			nodes[loop - 1].next = l.sent()
-			l.sent().prev = &nodes[loop - 1]
+			nodes[loop-1].next = l.sent()
+			l.sent().prev = &nodes[loop-1]
 			nodes[0].prev = l.sent()
 			l.sent().next = &nodes[0]
 			l.size = loop

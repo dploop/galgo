@@ -1,4 +1,4 @@
-package single_list
+package singly
 
 import (
 	"testing"
@@ -17,24 +17,6 @@ func BenchmarkNewList(b *testing.B) {
 	}
 }
 
-func TestList_Empty(t *testing.T) {
-	l := NewList()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
-	l.PushFront(42)
-	if l.Empty() {
-		t.Errorf("l(%v) is empty", l)
-	}
-}
-
-func BenchmarkList_Empty(b *testing.B) {
-	l := NewList()
-	for n := 0; n < b.N; n++ {
-		_ = l.Empty()
-	}
-}
-
 func TestList_Size(t *testing.T) {
 	l := NewList()
 	if l.Size() != 0 {
@@ -50,6 +32,24 @@ func BenchmarkList_Size(b *testing.B) {
 	l := NewList()
 	for n := 0; n < b.N; n++ {
 		_ = l.Size()
+	}
+}
+
+func TestList_Empty(t *testing.T) {
+	l := NewList()
+	if !l.Empty() {
+		t.Errorf("l(%v) is not empty", l)
+	}
+	l.PushFront(42)
+	if l.Empty() {
+		t.Errorf("l(%v) is empty", l)
+	}
+}
+
+func BenchmarkList_Empty(b *testing.B) {
+	l := NewList()
+	for n := 0; n < b.N; n++ {
+		_ = l.Empty()
 	}
 }
 
@@ -110,7 +110,7 @@ func BenchmarkList_PopFront(b *testing.B) {
 		if l.size == 0 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = nodes[k]
+				nodes[k-1].next = nodes[k]
 			}
 			l.sent().next = nodes[0]
 			l.size = loop
@@ -139,13 +139,13 @@ func BenchmarkList_Clear(b *testing.B) {
 func TestList_Begin(t *testing.T) {
 	l := NewList()
 	begin := l.Begin()
-	if begin.node != nil {
-		t.Errorf("begin.node(%p) != nil", begin.node)
+	if begin.n != nil {
+		t.Errorf("begin.n(%p) != nil", begin.n)
 	}
 	l.PushFront(42)
 	begin = l.Begin()
-	if begin.node == nil {
-		t.Errorf("begin.node(%p) == nil", begin.node)
+	if begin.n == nil {
+		t.Errorf("begin.n(%p) == nil", begin.n)
 	}
 }
 
@@ -159,13 +159,13 @@ func BenchmarkList_Begin(b *testing.B) {
 func TestList_End(t *testing.T) {
 	l := NewList()
 	end := l.End()
-	if end.node != nil {
-		t.Errorf("end.node(%p) != nil", end.node)
+	if end.n != nil {
+		t.Errorf("end.n(%p) != nil", end.n)
 	}
 	l.PushFront(42)
 	end = l.End()
-	if end.node != nil {
-		t.Errorf("end.node(%p) != nil", end.node)
+	if end.n != nil {
+		t.Errorf("end.n(%p) != nil", end.n)
 	}
 }
 
@@ -236,7 +236,7 @@ func BenchmarkList_EraseAfter(b *testing.B) {
 		if l.size <= 1 {
 			b.StopTimer()
 			for k := 1; k < loop; k++ {
-				nodes[k - 1].next = &nodes[k]
+				nodes[k-1].next = &nodes[k]
 			}
 			l.sent().next = &nodes[0]
 			l.size = loop

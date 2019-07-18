@@ -1,11 +1,10 @@
 package iterators
 
 import (
-	"github.com/dploop/galgo/basics"
+	"github.com/dploop/gostl/traits"
 )
 
 type Iterator interface {
-	basics.Cloneable
-	Readable
-	Incrementable
+	traits.Cloneable
+	traits.Incrementable
 }

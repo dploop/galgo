@@ -1,5 +1,9 @@
 package iterators
 
+import (
+	"github.com/dploop/gostl/traits"
+)
+
 type MutableIterator interface {
-	Writeable
+	traits.Writeable
 }

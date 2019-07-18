@@ -1,0 +1,10 @@
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+
+issues:
+  exclude:
+    - "`prev` is unused"
+    - "`next` is unused"
+    - "nilness: nil dereference in load"

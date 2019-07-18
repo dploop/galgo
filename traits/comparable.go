@@ -1,4 +1,4 @@
-package basics
+package traits
 
 type EqualityComparable interface {
 	Equal(other EqualityComparable) bool

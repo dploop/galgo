@@ -1,17 +1,19 @@
-package single_list
+package singly
 
 import (
 	"unsafe"
+
+	"github.com/dploop/gostl/types"
 )
 
 type List struct {
 	next *node
-	size Size
+	size types.Size
 }
 
 type node struct {
 	next *node
-	data Data
+	data types.Data
 }
 
 func (l *List) sent() *node {
@@ -22,21 +24,21 @@ func NewList() *List {
 	return &List{}
 }
 
-func (l *List) Empty() bool {
-	return l.size == 0
-}
-
-func (l *List) Size() Size {
+func (l *List) Size() types.Size {
 	return l.size
 }
 
-func (l *List) PushFront(data Data) {
+func (l *List) Empty() bool {
+	return l.Size() == 0
+}
+
+func (l *List) PushFront(data types.Data) {
 	s := l.sent()
 	s.next = &node{next: s.next, data: data}
 	l.size++
 }
 
-func (l *List) Front() Data {
+func (l *List) Front() types.Data {
 	return l.sent().next.data
 }
 
@@ -52,21 +54,21 @@ func (l *List) Clear() {
 }
 
 func (l *List) Begin() Iterator {
-	return Iterator{l.sent().next}
+	return Iterator{n: l.sent().next}
 }
 
 func (l *List) End() Iterator {
 	return Iterator{}
 }
 
-func (l *List) InsertAfter(i Iterator, data Data) Iterator {
-	i.next = &node{next: i.next, data: data}
+func (l *List) InsertAfter(i Iterator, data types.Data) Iterator {
+	i.n.next = &node{next: i.n.next, data: data}
 	l.size++
-	return Iterator{i.next}
+	return Iterator{n: i.n.next}
 }
 
 func (l *List) EraseAfter(i Iterator) Iterator {
-	i.next = i.next.next
+	i.n.next = i.n.next.next
 	l.size--
-	return Iterator{i.next}
+	return Iterator{n: i.n.next}
 }

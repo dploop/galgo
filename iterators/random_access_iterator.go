@@ -1,13 +1,14 @@
 package iterators
 
 import (
-	"github.com/dploop/galgo/basics"
+	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/types"
 )
 
 type RandomAccessIterator interface {
 	BidirectionalIterator
-	basics.LessThanComparable
-	At(diff Size) Data
-	Advance(diff Size)
-	Distance(other RandomAccessIterator) Size
+	traits.LessThanComparable
+	At(diff types.Size) types.Data
+	Advance(diff types.Size) RandomAccessIterator
+	Distance(other RandomAccessIterator) types.Size
 }

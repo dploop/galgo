@@ -1,3 +1,3 @@
-module github.com/dploop/galgo
+module github.com/dploop/gostl
 
 go 1.12

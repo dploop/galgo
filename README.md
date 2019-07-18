@@ -1,2 +1,2 @@
-# A Golang Algorithm Library
+# A Golang Standard Library
 
