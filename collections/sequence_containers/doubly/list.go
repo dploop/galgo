@@ -1,14 +1,11 @@
 package doubly
 
 import (
-	"unsafe"
-
 	"github.com/dploop/gostl/types"
 )
 
 type List struct {
-	prev *node
-	next *node
+	sent *node
 	size types.Size
 }
 
@@ -18,21 +15,16 @@ type node struct {
 	data types.Data
 }
 
-func (l *List) sent() *node {
-	return (*node)(unsafe.Pointer(l))
-}
-
 func (l *List) assert(p *node) {
-	if p == l.sent() {
+	if p == l.sent {
 		_ = *(*node)(nil)
 	}
 }
 
 func NewList() *List {
-	l := &List{}
-	s := l.sent()
+	s := &node{}
 	s.prev, s.next = s, s
-	return l
+	return &List{sent: s}
 }
 
 func (l *List) Size() types.Size {
@@ -45,16 +37,16 @@ func (l *List) Empty() bool {
 
 func (l *List) PushFront(data types.Data) {
 	p := &node{data: data}
-	l.link(l.sent().next, p, p)
+	l.link(l.sent.next, p, p)
 	l.size++
 }
 
 func (l *List) Front() types.Data {
-	return l.sent().next.data
+	return l.sent.next.data
 }
 
 func (l *List) PopFront() {
-	p := l.sent().next
+	p := l.sent.next
 	l.assert(p)
 	l.unlink(p, p)
 	l.size--
@@ -62,41 +54,41 @@ func (l *List) PopFront() {
 
 func (l *List) PushBack(data types.Data) {
 	p := &node{data: data}
-	l.link(l.sent(), p, p)
+	l.link(l.sent, p, p)
 	l.size++
 }
 
 func (l *List) Back() types.Data {
-	return l.sent().prev.data
+	return l.sent.prev.data
 }
 
 func (l *List) PopBack() {
-	p := l.sent().prev
+	p := l.sent.prev
 	l.assert(p)
 	l.unlink(p, p)
 	l.size--
 }
 
 func (l *List) Clear() {
-	s := l.sent()
+	s := l.sent
 	s.prev, s.next = s, s
 	l.size = 0
 }
 
 func (l *List) Begin() Iterator {
-	return Iterator{n: l.sent().next}
+	return Iterator{n: l.sent.next}
 }
 
 func (l *List) End() Iterator {
-	return Iterator{n: l.sent()}
+	return Iterator{n: l.sent}
 }
 
 func (l *List) ReverseBegin() Iterator {
-	return Iterator{n: l.sent().prev}
+	return Iterator{n: l.sent.prev}
 }
 
 func (l *List) ReverseEnd() Iterator {
-	return Iterator{n: l.sent()}
+	return Iterator{n: l.sent}
 }
 
 func (l *List) Insert(i Iterator, data types.Data) Iterator {

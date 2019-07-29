@@ -38,7 +38,7 @@ func BenchmarkList_Size(b *testing.B) {
 	l := NewList()
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(42)
 		}
 		tmp += l.Size()
@@ -61,7 +61,7 @@ func BenchmarkList_Empty(b *testing.B) {
 	l := NewList()
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(42)
 		}
 		if l.Empty() {
@@ -85,7 +85,7 @@ func BenchmarkList_Get(b *testing.B) {
 	l.PushBack(0)
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		l.array[0] = n
+		l.slice[0] = n
 		tmp = l.Get(0).(int)
 	}
 	_, _ = fmt.Fprint(ioutil.Discard, tmp)
@@ -123,7 +123,7 @@ func BenchmarkList_PushBack(b *testing.B) {
 	loop := 1000000
 	l := NewList()
 	for n := 0; n < b.N; n++ {
-		if len(l.array) == loop {
+		if len(l.slice) == loop {
 			l.Clear()
 		}
 		l.PushBack(42)
@@ -144,7 +144,7 @@ func BenchmarkList_Back(b *testing.B) {
 	l.PushBack(42)
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		l.array[0] = n
+		l.slice[0] = n
 		tmp = l.Back().(int)
 	}
 	_, _ = fmt.Fprint(ioutil.Discard, tmp)
@@ -164,9 +164,9 @@ func BenchmarkList_PopBack(b *testing.B) {
 	array := make([]types.Data, loop)
 	l := NewList()
 	for n := 0; n < b.N; n++ {
-		if len(l.array) == 0 {
+		if len(l.slice) == 0 {
 			b.StopTimer()
-			l.array = array
+			l.slice = array
 			b.StartTimer()
 		}
 		l.PopBack()
@@ -186,7 +186,7 @@ func BenchmarkList_Clear(b *testing.B) {
 	l := NewList()
 	for n := 0; n < b.N; n++ {
 		l.Clear()
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(0)
 		}
 	}
@@ -211,7 +211,7 @@ func BenchmarkList_Begin(b *testing.B) {
 	l.PushBack(0)
 	var tmp Iterator
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(0)
 		}
 		tmp = l.Begin()
@@ -237,7 +237,7 @@ func BenchmarkList_End(b *testing.B) {
 	l.PushBack(0)
 	var tmp Iterator
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(0)
 		}
 		tmp = l.End()
@@ -263,7 +263,7 @@ func BenchmarkList_ReverseBegin(b *testing.B) {
 	l.PushBack(0)
 	var tmp Iterator
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(0)
 		}
 		tmp = l.ReverseBegin()
@@ -289,7 +289,7 @@ func BenchmarkList_ReverseEnd(b *testing.B) {
 	l.PushBack(0)
 	var tmp Iterator
 	for n := 0; n < b.N; n++ {
-		if n % 1000000 == 0 {
+		if n%1000000 == 0 {
 			l.PushBack(0)
 		}
 		tmp = l.ReverseEnd()

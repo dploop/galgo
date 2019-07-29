@@ -5,7 +5,7 @@ import (
 )
 
 type List struct {
-	array []types.Data
+	slice []types.Data
 }
 
 func NewList() *List {
@@ -13,7 +13,7 @@ func NewList() *List {
 }
 
 func (l *List) Size() types.Size {
-	return len(l.array)
+	return len(l.slice)
 }
 
 func (l *List) Empty() bool {
@@ -21,28 +21,27 @@ func (l *List) Empty() bool {
 }
 
 func (l *List) Get(i types.Size) types.Data {
-	return l.array[i]
+	return l.slice[i]
 }
 
 func (l *List) Set(n types.Size, data types.Data) {
-	l.array[n] = data
+	l.slice[n] = data
 }
 
 func (l *List) PushBack(data types.Data) {
-	l.array = append(l.array, data)
+	l.slice = append(l.slice, data)
 }
 
 func (l *List) Back() types.Data {
-	return l.array[len(l.array)-1]
+	return l.slice[len(l.slice)-1]
 }
 
 func (l *List) PopBack() {
-	l.array = l.array[:len(l.array)-1]
+	l.slice = l.slice[:len(l.slice)-1]
 }
 
-
 func (l *List) Clear() {
-	l.array = nil
+	l.slice = nil
 }
 
 func (l *List) Begin() Iterator {
@@ -50,11 +49,11 @@ func (l *List) Begin() Iterator {
 }
 
 func (l *List) End() Iterator {
-	return Iterator{l: l, n: len(l.array)}
+	return Iterator{l: l, n: len(l.slice)}
 }
 
 func (l *List) ReverseBegin() Iterator {
-	return Iterator{l: l, n: len(l.array) - 1}
+	return Iterator{l: l, n: len(l.slice) - 1}
 }
 
 func (l *List) ReverseEnd() Iterator {

@@ -189,7 +189,7 @@ func BenchmarkIterator_Read(b *testing.B) {
 	i := l.Begin()
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		l.array[0] = n
+		l.slice[0] = n
 		tmp = i.Read().(int)
 	}
 	_, _ = fmt.Fprint(ioutil.Discard, tmp)
@@ -303,7 +303,7 @@ func BenchmarkIterator_At(b *testing.B) {
 	i := l.Begin()
 	var tmp int
 	for n := 0; n < b.N; n++ {
-		l.array[0] = n
+		l.slice[0] = n
 		tmp = i.At(0).(int)
 	}
 	_, _ = fmt.Fprint(ioutil.Discard, tmp)

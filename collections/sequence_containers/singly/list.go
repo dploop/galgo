@@ -1,13 +1,11 @@
 package singly
 
 import (
-	"unsafe"
-
 	"github.com/dploop/gostl/types"
 )
 
 type List struct {
-	next *node
+	sent *node
 	size types.Size
 }
 
@@ -16,12 +14,15 @@ type node struct {
 	data types.Data
 }
 
-func (l *List) sent() *node {
-	return (*node)(unsafe.Pointer(l))
-}
-
-func NewList() *List {
-	return &List{}
+func NewList(datas ...types.Data) *List {
+	l := &List{sent: &node{}}
+	t := l.sent
+	for _, data := range datas {
+		t.next = &node{data: data}
+		l.size++
+		t = t.next
+	}
+	return l
 }
 
 func (l *List) Size() types.Size {
@@ -33,28 +34,28 @@ func (l *List) Empty() bool {
 }
 
 func (l *List) PushFront(data types.Data) {
-	s := l.sent()
+	s := l.sent
 	s.next = &node{next: s.next, data: data}
 	l.size++
 }
 
 func (l *List) Front() types.Data {
-	return l.sent().next.data
+	return l.sent.next.data
 }
 
 func (l *List) PopFront() {
-	s := l.sent()
+	s := l.sent
 	s.next = s.next.next
 	l.size--
 }
 
 func (l *List) Clear() {
-	l.sent().next = nil
+	l.sent.next = nil
 	l.size = 0
 }
 
 func (l *List) Begin() Iterator {
-	return Iterator{n: l.sent().next}
+	return Iterator{n: l.sent.next}
 }
 
 func (l *List) End() Iterator {

@@ -116,10 +116,10 @@ func BenchmarkList_PopFront(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			l.sent().next = &nodes[0]
-			nodes[0].prev = l.sent()
-			l.sent().prev = &nodes[loop-1]
-			nodes[loop-1].next = l.sent()
+			l.sent.next = &nodes[0]
+			nodes[0].prev = l.sent
+			l.sent.prev = &nodes[loop-1]
+			nodes[loop-1].next = l.sent
 			l.size = loop
 			b.StartTimer()
 		}
@@ -184,10 +184,10 @@ func BenchmarkList_PopBack(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			nodes[0].prev = l.sent()
-			l.sent().next = &nodes[0]
-			nodes[loop-1].next = l.sent()
-			l.sent().prev = &nodes[loop-1]
+			nodes[0].prev = l.sent
+			l.sent.next = &nodes[0]
+			nodes[loop-1].next = l.sent
+			l.sent.prev = &nodes[loop-1]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -213,7 +213,7 @@ func BenchmarkList_Clear(b *testing.B) {
 
 func TestList_Begin(t *testing.T) {
 	l := NewList()
-	s := l.sent()
+	s := l.sent
 	begin := l.Begin()
 	if begin.n != s {
 		t.Errorf("begin.n(%p) != s(%p)", begin.n, s)
@@ -234,7 +234,7 @@ func BenchmarkList_Begin(b *testing.B) {
 
 func TestList_End(t *testing.T) {
 	l := NewList()
-	s := l.sent()
+	s := l.sent
 	end := l.End()
 	if end.n != s {
 		t.Errorf("end.n(%p) != s(%p)", end.n, s)
@@ -255,7 +255,7 @@ func BenchmarkList_End(b *testing.B) {
 
 func TestList_ReverseBegin(t *testing.T) {
 	l := NewList()
-	s := l.sent()
+	s := l.sent
 	rbegin := l.ReverseBegin()
 	if rbegin.n != s {
 		t.Errorf("rbegin.n(%p) != s(%p)", rbegin.n, s)
@@ -276,7 +276,7 @@ func BenchmarkList_ReverseBegin(b *testing.B) {
 
 func TestList_ReverseEnd(t *testing.T) {
 	l := NewList()
-	s := l.sent()
+	s := l.sent
 	rend := l.ReverseEnd()
 	if rend.n != s {
 		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
@@ -358,10 +358,10 @@ func BenchmarkList_Erase(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			nodes[loop-1].next = l.sent()
-			l.sent().prev = &nodes[loop-1]
-			nodes[0].prev = l.sent()
-			l.sent().next = &nodes[0]
+			nodes[loop-1].next = l.sent
+			l.sent.prev = &nodes[loop-1]
+			nodes[0].prev = l.sent
+			l.sent.next = &nodes[0]
 			l.size = loop
 			i = l.ReverseBegin()
 			b.StartTimer()

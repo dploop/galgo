@@ -112,7 +112,7 @@ func BenchmarkList_PopFront(b *testing.B) {
 			for k := 1; k < loop; k++ {
 				nodes[k-1].next = nodes[k]
 			}
-			l.sent().next = nodes[0]
+			l.sent.next = nodes[0]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -238,7 +238,7 @@ func BenchmarkList_EraseAfter(b *testing.B) {
 			for k := 1; k < loop; k++ {
 				nodes[k-1].next = &nodes[k]
 			}
-			l.sent().next = &nodes[0]
+			l.sent.next = &nodes[0]
 			l.size = loop
 			i = l.Begin()
 			b.StartTimer()

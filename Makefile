@@ -7,10 +7,13 @@ cover:
 bench: bench_singly bench_doubly bench_vector
 
 bench_singly:
-	go test -gcflags="-l -N" -v ./collections/sequence_containers/singly/... -bench . -run ^$$
+	go test -v  -bench . -run ^$$ ./collections/sequence_containers/singly/...
 
 bench_doubly:
-	go test -gcflags="-l -N" -v ./collections/sequence_containers/doubly/... -bench . -run ^$$
+	go test -v  -bench . -run ^$$ ./collections/sequence_containers/doubly/...
 
 bench_vector:
-	go test -v ./collections/sequence_containers/vector/... -bench . -run ^$$
+	go test -v  -bench . -run ^$$ ./collections/sequence_containers/vector/...
+
+lint:
+	golangci-lint run

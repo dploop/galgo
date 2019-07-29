@@ -14,7 +14,7 @@ type Iterator struct {
 }
 
 func (i Iterator) Write(data types.Data) {
-	i.l.array[i.n] = data
+	i.l.slice[i.n] = data
 }
 
 func (i Iterator) Clone() traits.Cloneable {
@@ -43,7 +43,7 @@ func (i Iterator) ImplEqual(other Iterator) bool {
 }
 
 func (i Iterator) Read() types.Data {
-	return i.l.array[i.n]
+	return i.l.slice[i.n]
 }
 
 func (i Iterator) Prev() traits.Decrementable {
@@ -64,7 +64,7 @@ func (i Iterator) ImplLess(other Iterator) bool {
 }
 
 func (i Iterator) At(diff types.Size) types.Data {
-	return i.l.array[i.n+diff]
+	return i.l.slice[i.n+diff]
 }
 
 func (i Iterator) Advance(diff types.Size) iterators.RandomAccessIterator {
