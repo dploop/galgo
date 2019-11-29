@@ -5,8 +5,8 @@ import (
 )
 
 type List struct {
-	sent *node
-	size types.Size
+	sentinel node
+	size     types.Size
 }
 
 type node struct {
@@ -14,14 +14,8 @@ type node struct {
 	data types.Data
 }
 
-func NewList(datas ...types.Data) *List {
-	l := &List{sent: &node{}}
-	t := l.sent
-	for _, data := range datas {
-		t.next = &node{data: data}
-		l.size++
-		t = t.next
-	}
+func New() *List {
+	l := &List{}
 	return l
 }
 
@@ -34,28 +28,28 @@ func (l *List) Empty() bool {
 }
 
 func (l *List) PushFront(data types.Data) {
-	s := l.sent
+	s := &l.sentinel
 	s.next = &node{next: s.next, data: data}
 	l.size++
 }
 
 func (l *List) Front() types.Data {
-	return l.sent.next.data
+	return l.sentinel.next.data
 }
 
 func (l *List) PopFront() {
-	s := l.sent
+	s := &l.sentinel
 	s.next = s.next.next
 	l.size--
 }
 
 func (l *List) Clear() {
-	l.sent.next = nil
+	l.sentinel.next = nil
 	l.size = 0
 }
 
 func (l *List) Begin() Iterator {
-	return Iterator{n: l.sent.next}
+	return Iterator{n: l.sentinel.next}
 }
 
 func (l *List) End() Iterator {

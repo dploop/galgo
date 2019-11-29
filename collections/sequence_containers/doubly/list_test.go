@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewList(t *testing.T) {
-	l := NewList()
+	l := New()
 	if l == nil {
 		t.Errorf("l(%v) == nil", l)
 	}
@@ -13,12 +13,12 @@ func TestNewList(t *testing.T) {
 
 func BenchmarkNewList(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = NewList()
+		_ = New()
 	}
 }
 
 func TestList_Size(t *testing.T) {
-	l := NewList()
+	l := New()
 	if l.Size() != 0 {
 		t.Errorf("l(%v) is not 0 sized", l)
 	}
@@ -29,14 +29,14 @@ func TestList_Size(t *testing.T) {
 }
 
 func BenchmarkList_Size(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.Size()
 	}
 }
 
 func TestList_Empty(t *testing.T) {
-	l := NewList()
+	l := New()
 	if !l.Empty() {
 		t.Errorf("l(%v) is not empty", l)
 	}
@@ -47,14 +47,14 @@ func TestList_Empty(t *testing.T) {
 }
 
 func BenchmarkList_Empty(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.Empty()
 	}
 }
 
 func TestList_PushFront(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushFront(42)
 	data := l.Front().(int)
 	if data != 42 {
@@ -64,7 +64,7 @@ func TestList_PushFront(t *testing.T) {
 
 func BenchmarkList_PushFront(b *testing.B) {
 	loop := 1000000
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		if l.size == loop {
 			l.Clear()
@@ -74,7 +74,7 @@ func BenchmarkList_PushFront(b *testing.B) {
 }
 
 func TestList_Front(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushFront(42)
 	data := l.Front().(int)
 	if data != 42 {
@@ -83,7 +83,7 @@ func TestList_Front(t *testing.T) {
 }
 
 func BenchmarkList_Front(b *testing.B) {
-	l := NewList()
+	l := New()
 	l.PushFront(42)
 	for n := 0; n < b.N; n++ {
 		_ = l.Front()
@@ -96,7 +96,7 @@ func TestList_PopFront(t *testing.T) {
 			t.Errorf("failed to panic")
 		}
 	}()
-	l := NewList()
+	l := New()
 	l.PushFront(42)
 	l.PopFront()
 	if !l.Empty() {
@@ -108,7 +108,7 @@ func TestList_PopFront(t *testing.T) {
 func BenchmarkList_PopFront(b *testing.B) {
 	const loop = 1000000
 	var nodes [loop]node
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		if l.size == 0 {
 			b.StopTimer()
@@ -116,10 +116,10 @@ func BenchmarkList_PopFront(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			l.sent.next = &nodes[0]
-			nodes[0].prev = l.sent
-			l.sent.prev = &nodes[loop-1]
-			nodes[loop-1].next = l.sent
+			l.sentinel.next = &nodes[0]
+			nodes[0].prev = &l.sentinel
+			l.sentinel.prev = &nodes[loop-1]
+			nodes[loop-1].next = &l.sentinel
 			l.size = loop
 			b.StartTimer()
 		}
@@ -128,7 +128,7 @@ func BenchmarkList_PopFront(b *testing.B) {
 }
 
 func TestList_PushBack(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushBack(42)
 	data := l.Back().(int)
 	if data != 42 {
@@ -138,7 +138,7 @@ func TestList_PushBack(t *testing.T) {
 
 func BenchmarkList_PushBack(b *testing.B) {
 	loop := 1000000
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		if l.size == loop {
 			l.Clear()
@@ -148,7 +148,7 @@ func BenchmarkList_PushBack(b *testing.B) {
 }
 
 func TestList_Back(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushBack(42)
 	data := l.Back().(int)
 	if data != 42 {
@@ -157,7 +157,7 @@ func TestList_Back(t *testing.T) {
 }
 
 func BenchmarkList_Back(b *testing.B) {
-	l := NewList()
+	l := New()
 	l.PushBack(42)
 	for n := 0; n < b.N; n++ {
 		_ = l.Back()
@@ -165,7 +165,7 @@ func BenchmarkList_Back(b *testing.B) {
 }
 
 func TestList_PopBack(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushBack(42)
 	l.PopBack()
 	if !l.Empty() {
@@ -176,7 +176,7 @@ func TestList_PopBack(t *testing.T) {
 func BenchmarkList_PopBack(b *testing.B) {
 	const loop = 1000000
 	var nodes [loop]node
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		if l.size == 0 {
 			b.StopTimer()
@@ -184,10 +184,10 @@ func BenchmarkList_PopBack(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			nodes[0].prev = l.sent
-			l.sent.next = &nodes[0]
-			nodes[loop-1].next = l.sent
-			l.sent.prev = &nodes[loop-1]
+			nodes[0].prev = &l.sentinel
+			l.sentinel.next = &nodes[0]
+			nodes[loop-1].next = &l.sentinel
+			l.sentinel.prev = &nodes[loop-1]
 			l.size = loop
 			b.StartTimer()
 		}
@@ -196,7 +196,7 @@ func BenchmarkList_PopBack(b *testing.B) {
 }
 
 func TestList_Clear(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushFront(42)
 	l.Clear()
 	if !l.Empty() {
@@ -205,15 +205,15 @@ func TestList_Clear(t *testing.T) {
 }
 
 func BenchmarkList_Clear(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		l.Clear()
 	}
 }
 
 func TestList_Begin(t *testing.T) {
-	l := NewList()
-	s := l.sent
+	l := New()
+	s := &l.sentinel
 	begin := l.Begin()
 	if begin.n != s {
 		t.Errorf("begin.n(%p) != s(%p)", begin.n, s)
@@ -226,15 +226,15 @@ func TestList_Begin(t *testing.T) {
 }
 
 func BenchmarkList_Begin(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.Begin()
 	}
 }
 
 func TestList_End(t *testing.T) {
-	l := NewList()
-	s := l.sent
+	l := New()
+	s := &l.sentinel
 	end := l.End()
 	if end.n != s {
 		t.Errorf("end.n(%p) != s(%p)", end.n, s)
@@ -247,15 +247,15 @@ func TestList_End(t *testing.T) {
 }
 
 func BenchmarkList_End(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.End()
 	}
 }
 
 func TestList_ReverseBegin(t *testing.T) {
-	l := NewList()
-	s := l.sent
+	l := New()
+	s := &l.sentinel
 	rbegin := l.ReverseBegin()
 	if rbegin.n != s {
 		t.Errorf("rbegin.n(%p) != s(%p)", rbegin.n, s)
@@ -268,15 +268,15 @@ func TestList_ReverseBegin(t *testing.T) {
 }
 
 func BenchmarkList_ReverseBegin(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.ReverseBegin()
 	}
 }
 
 func TestList_ReverseEnd(t *testing.T) {
-	l := NewList()
-	s := l.sent
+	l := New()
+	s := &l.sentinel
 	rend := l.ReverseEnd()
 	if rend.n != s {
 		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
@@ -289,14 +289,14 @@ func TestList_ReverseEnd(t *testing.T) {
 }
 
 func BenchmarkList_ReverseEnd(b *testing.B) {
-	l := NewList()
+	l := New()
 	for n := 0; n < b.N; n++ {
 		_ = l.ReverseEnd()
 	}
 }
 
 func TestList_Insert(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushBack(1)
 	i := l.ReverseBegin()
 	j := l.Insert(i, 2)
@@ -317,7 +317,7 @@ func TestList_Insert(t *testing.T) {
 
 func BenchmarkList_Insert(b *testing.B) {
 	loop := 1000000
-	l := NewList()
+	l := New()
 	l.PushBack(42)
 	i := l.ReverseBegin()
 	for n := 0; n < b.N; n++ {
@@ -331,7 +331,7 @@ func BenchmarkList_Insert(b *testing.B) {
 }
 
 func TestList_Erase(t *testing.T) {
-	l := NewList()
+	l := New()
 	l.PushBack(3)
 	l.PushBack(2)
 	l.PushBack(1)
@@ -349,7 +349,7 @@ func TestList_Erase(t *testing.T) {
 func BenchmarkList_Erase(b *testing.B) {
 	const loop = 1000000
 	var nodes [loop]node
-	l := NewList()
+	l := New()
 	i := l.ReverseBegin()
 	for n := 0; n < b.N; n++ {
 		if l.size <= 1 {
@@ -358,10 +358,10 @@ func BenchmarkList_Erase(b *testing.B) {
 				nodes[k-1].next = &nodes[k]
 				nodes[k].prev = &nodes[k-1]
 			}
-			nodes[loop-1].next = l.sent
-			l.sent.prev = &nodes[loop-1]
-			nodes[0].prev = l.sent
-			l.sent.next = &nodes[0]
+			nodes[loop-1].next = &l.sentinel
+			l.sentinel.prev = &nodes[loop-1]
+			nodes[0].prev = &l.sentinel
+			l.sentinel.next = &nodes[0]
 			l.size = loop
 			i = l.ReverseBegin()
 			b.StartTimer()
