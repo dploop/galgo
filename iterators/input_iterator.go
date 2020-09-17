@@ -1,11 +1,11 @@
 package iterators
 
 import (
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 )
 
 type InputIterator interface {
 	Iterator
-	traits.EqualityComparable
-	traits.Readable
+	constraints.EqualityComparable
+	constraints.Readable
 }

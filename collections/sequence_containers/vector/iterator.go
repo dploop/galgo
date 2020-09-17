@@ -1,8 +1,8 @@
 package vector
 
 import (
+	"github.com/dploop/gostl/constraints"
 	"github.com/dploop/gostl/iterators"
-	"github.com/dploop/gostl/traits"
 	"github.com/dploop/gostl/types"
 )
 
@@ -17,7 +17,7 @@ func (i Iterator) Write(data types.Data) {
 	i.l.slice[i.n] = data
 }
 
-func (i Iterator) Clone() traits.Cloneable {
+func (i Iterator) Clone() constraints.Cloneable {
 	return i.ImplClone()
 }
 
@@ -25,7 +25,7 @@ func (i Iterator) ImplClone() Iterator {
 	return i
 }
 
-func (i Iterator) Next() traits.Incrementable {
+func (i Iterator) Next() constraints.Incrementable {
 	return i.ImplNext()
 }
 
@@ -34,7 +34,7 @@ func (i Iterator) ImplNext() Iterator {
 	return i
 }
 
-func (i Iterator) Equal(other traits.EqualityComparable) bool {
+func (i Iterator) Equal(other constraints.EqualityComparable) bool {
 	return i.ImplEqual(other.(Iterator))
 }
 
@@ -46,7 +46,7 @@ func (i Iterator) Read() types.Data {
 	return i.l.slice[i.n]
 }
 
-func (i Iterator) Prev() traits.Decrementable {
+func (i Iterator) Prev() constraints.Decrementable {
 	return i.ImplPrev()
 }
 
@@ -55,7 +55,7 @@ func (i Iterator) ImplPrev() Iterator {
 	return i
 }
 
-func (i Iterator) Less(other traits.LessThanComparable) bool {
+func (i Iterator) Less(other constraints.LessThanComparable) bool {
 	return i.ImplLess(other.(Iterator))
 }
 

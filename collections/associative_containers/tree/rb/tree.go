@@ -1,7 +1,7 @@
 package rb
 
 import (
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 	"github.com/dploop/gostl/types"
 )
 
@@ -9,7 +9,7 @@ type Tree struct {
 	sentinel node
 	start    *node
 	size     types.Size
-	comp     traits.LessThan
+	comp     constraints.LessThan
 }
 
 const (
@@ -25,7 +25,7 @@ type node struct {
 	data   types.Data
 }
 
-func New(comp traits.LessThan) *Tree {
+func New(comp constraints.LessThan) *Tree {
 	t := &Tree{comp: comp}
 	t.start = &t.sentinel
 	return t

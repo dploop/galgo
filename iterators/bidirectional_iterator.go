@@ -1,10 +1,10 @@
 package iterators
 
 import (
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 )
 
 type BidirectionalIterator interface {
 	ForwardIterator
-	traits.Decrementable
+	constraints.Decrementable
 }

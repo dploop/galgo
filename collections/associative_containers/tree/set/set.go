@@ -2,16 +2,16 @@ package set
 
 import (
 	base "github.com/dploop/gostl/collections/associative_containers/tree/avl"
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 	"github.com/dploop/gostl/types"
 )
 
 type Set struct {
 	base *base.Tree
-	comp traits.LessThan
+	comp constraints.LessThan
 }
 
-func New(keyComp traits.LessThan) *Set {
+func New(keyComp constraints.LessThan) *Set {
 	valueComp := keyComp
 	return &Set{
 		base: base.New(valueComp),

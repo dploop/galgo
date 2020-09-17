@@ -1,4 +1,4 @@
-package traits
+package constraints
 
 import (
 	"github.com/dploop/gostl/types"

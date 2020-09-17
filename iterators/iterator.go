@@ -1,10 +1,10 @@
 package iterators
 
 import (
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 )
 
 type Iterator interface {
-	traits.Cloneable
-	traits.Incrementable
+	constraints.Cloneable
+	constraints.Incrementable
 }

@@ -2,13 +2,13 @@ package multidict
 
 import (
 	base "github.com/dploop/gostl/collections/associative_containers/tree/avl"
-	"github.com/dploop/gostl/traits"
+	"github.com/dploop/gostl/constraints"
 	"github.com/dploop/gostl/types"
 )
 
 type Dict struct {
 	base *base.Tree
-	comp traits.LessThan
+	comp constraints.LessThan
 }
 
 type Value struct {
@@ -16,7 +16,7 @@ type Value struct {
 	Mapped types.Data
 }
 
-func New(keyComp traits.LessThan) *Dict {
+func New(keyComp constraints.LessThan) *Dict {
 	valueComp := func(x types.Data, y types.Data) bool {
 		return keyComp(x.(Value).Key, y.(Value).Key)
 	}
