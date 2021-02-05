@@ -20,6 +20,7 @@ func New(keyComp constraints.LessThan) *Dict {
 	valueComp := func(x types.Data, y types.Data) bool {
 		return keyComp(x.(Value).Key, y.(Value).Key)
 	}
+
 	return &Dict{
 		base: base.New(valueComp),
 		comp: keyComp,
@@ -64,6 +65,7 @@ func (d *Dict) Contains(k types.Data) bool {
 
 func (d *Dict) EqualRange(k types.Data) (Iterator, Iterator) {
 	lb, ub := d.base.EqualRangeUnique(Value{Key: k})
+
 	return Iterator{base: lb}, Iterator{base: ub}
 }
 
@@ -81,6 +83,7 @@ func (d *Dict) Clear() {
 
 func (d *Dict) Insert(k types.Data, m types.Data) (Iterator, bool) {
 	it, ok := d.base.InsertUnique(Value{Key: k, Mapped: m})
+
 	return Iterator{base: it}, ok
 }
 

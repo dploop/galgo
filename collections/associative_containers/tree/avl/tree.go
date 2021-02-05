@@ -29,6 +29,7 @@ type node struct {
 func New(comp constraints.LessThan) *Tree {
 	t := &Tree{comp: comp}
 	t.start = &t.sentinel
+
 	return t
 }
 
@@ -61,6 +62,7 @@ func (t *Tree) CountUnique(data types.Data) types.Size {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return 1
 	}
+
 	return 0
 }
 
@@ -68,8 +70,10 @@ func (t *Tree) CountMulti(data types.Data) (c types.Size) {
 	x, y := t.LowerBound(data), t.UpperBound(data)
 	for x != y {
 		c++
+
 		x = x.ImplNext()
 	}
+
 	return c
 }
 
@@ -78,6 +82,7 @@ func (t *Tree) Find(data types.Data) Iterator {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return x
 	}
+
 	return t.End()
 }
 
@@ -86,6 +91,7 @@ func (t *Tree) Contains(data types.Data) bool {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return true
 	}
+
 	return false
 }
 
@@ -94,6 +100,7 @@ func (t *Tree) EqualRangeUnique(data types.Data) (Iterator, Iterator) {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return x, x.ImplNext()
 	}
+
 	return x, x
 }
 
@@ -107,6 +114,7 @@ func (t *Tree) LowerBound(data types.Data) Iterator {
 
 func (t *Tree) lowerBound(data types.Data) *node {
 	x := &t.sentinel
+
 	for y := x.left; y != nil; {
 		if !t.comp(y.data, data) {
 			x = y
@@ -115,6 +123,7 @@ func (t *Tree) lowerBound(data types.Data) *node {
 			y = y.right
 		}
 	}
+
 	return x
 }
 
@@ -124,6 +133,7 @@ func (t *Tree) UpperBound(data types.Data) Iterator {
 
 func (t *Tree) upperBound(data types.Data) *node {
 	x := &t.sentinel
+
 	for y := x.left; y != nil; {
 		if t.comp(data, y.data) {
 			x = y
@@ -132,6 +142,7 @@ func (t *Tree) upperBound(data types.Data) *node {
 			y = y.right
 		}
 	}
+
 	return x
 }
 
@@ -146,14 +157,17 @@ func (t *Tree) InsertUnique(v types.Data) (Iterator, bool) {
 	if lb != t.End() && !t.comp(v, lb.Read()) {
 		return t.End(), false
 	}
+
 	z := &node{data: v}
 	t.insert(z)
+
 	return Iterator{n: z}, true
 }
 
 func (t *Tree) InsertMulti(v types.Data) Iterator {
 	z := &node{data: v}
 	t.insert(z)
+
 	return Iterator{n: z}
 }
 
@@ -161,6 +175,7 @@ func (t *Tree) insert(z *node) {
 	z.extra = balanced
 	z.parent, z.left, z.right = nil, nil, nil
 	x, childIsLeft := &t.sentinel, true
+
 	for y := x.left; y != nil; {
 		x, childIsLeft = y, t.comp(z.data, y.data)
 		if childIsLeft {
@@ -169,15 +184,19 @@ func (t *Tree) insert(z *node) {
 			y = y.right
 		}
 	}
+
 	z.parent = x
+
 	if childIsLeft {
 		x.left = z
 	} else {
 		x.right = z
 	}
+
 	if t.start.left != nil {
 		t.start = t.start.left
 	}
+
 	t.balanceAfterInsert(x, childIsLeft)
 	t.size++
 }
@@ -188,6 +207,7 @@ func (t *Tree) balanceAfterInsert(x *node, childIsLeft bool) {
 			switch x.extra {
 			case leftHeavy:
 				x.extra = balanced
+
 				return
 			case rightHeavy:
 				if x.right.extra == leftHeavy {
@@ -195,6 +215,7 @@ func (t *Tree) balanceAfterInsert(x *node, childIsLeft bool) {
 				} else {
 					rotateLeft(x)
 				}
+
 				return
 			default:
 				x.extra = rightHeavy
@@ -203,6 +224,7 @@ func (t *Tree) balanceAfterInsert(x *node, childIsLeft bool) {
 			switch x.extra {
 			case rightHeavy:
 				x.extra = balanced
+
 				return
 			case leftHeavy:
 				if x.left.extra == rightHeavy {
@@ -210,11 +232,13 @@ func (t *Tree) balanceAfterInsert(x *node, childIsLeft bool) {
 				} else {
 					rotateRight(x)
 				}
+
 				return
 			default:
 				x.extra = leftHeavy
 			}
 		}
+
 		childIsLeft = x == x.parent.left
 	}
 }
@@ -222,6 +246,7 @@ func (t *Tree) balanceAfterInsert(x *node, childIsLeft bool) {
 func (t *Tree) Delete(i Iterator) Iterator {
 	r := i.ImplNext()
 	t.delete(i.n)
+
 	return r
 }
 
@@ -229,7 +254,9 @@ func (t *Tree) delete(z *node) {
 	if t.start == z {
 		t.start = successor(z)
 	}
+
 	x, childIsLeft := z.parent, z == z.parent.left
+
 	switch {
 	case z.left == nil:
 		transplant(z, z.right)
@@ -239,12 +266,14 @@ func (t *Tree) delete(z *node) {
 		if z.extra == rightHeavy {
 			y := minimum(z.right)
 			x, childIsLeft = y, y == y.parent.left
+
 			if y.parent != z {
 				x = y.parent
 				transplant(y, y.right)
 				y.right = z.right
 				y.right.parent = y
 			}
+
 			transplant(z, y)
 			y.left = z.left
 			y.left.parent = y
@@ -252,18 +281,21 @@ func (t *Tree) delete(z *node) {
 		} else {
 			y := maximum(z.left)
 			x, childIsLeft = y, y == y.parent.left
+
 			if y.parent != z {
 				x = y.parent
 				transplant(y, y.left)
 				y.left = z.left
 				y.left.parent = y
 			}
+
 			transplant(z, y)
 			y.right = z.right
 			y.right.parent = y
 			y.extra = z.extra
 		}
 	}
+
 	t.balanceAfterDelete(x, childIsLeft)
 	t.size--
 }
@@ -274,6 +306,7 @@ func (t *Tree) balanceAfterDelete(x *node, childIsLeft bool) {
 			switch x.extra {
 			case balanced:
 				x.extra = rightHeavy
+
 				return
 			case rightHeavy:
 				b := x.right.extra
@@ -282,9 +315,11 @@ func (t *Tree) balanceAfterDelete(x *node, childIsLeft bool) {
 				} else {
 					rotateLeft(x)
 				}
+
 				if b == balanced {
 					return
 				}
+
 				x = x.parent
 			default:
 				x.extra = balanced
@@ -293,6 +328,7 @@ func (t *Tree) balanceAfterDelete(x *node, childIsLeft bool) {
 			switch x.extra {
 			case balanced:
 				x.extra = leftHeavy
+
 				return
 			case leftHeavy:
 				b := x.left.extra
@@ -309,6 +345,7 @@ func (t *Tree) balanceAfterDelete(x *node, childIsLeft bool) {
 				x.extra = balanced
 			}
 		}
+
 		childIsLeft = x == x.parent.left
 	}
 }
@@ -316,17 +353,22 @@ func (t *Tree) balanceAfterDelete(x *node, childIsLeft bool) {
 func rotateLeft(x *node) {
 	z := x.right
 	x.right = z.left
+
 	if z.left != nil {
 		z.left.parent = x
 	}
+
 	z.parent = x.parent
+
 	if x == x.parent.left {
 		x.parent.left = z
 	} else {
 		x.parent.right = z
 	}
+
 	z.left = x
 	x.parent = z
+
 	if z.extra == balanced {
 		x.extra, z.extra = rightHeavy, leftHeavy
 	} else {
@@ -337,17 +379,22 @@ func rotateLeft(x *node) {
 func rotateRight(x *node) {
 	z := x.left
 	x.left = z.right
+
 	if z.right != nil {
 		z.right.parent = x
 	}
+
 	z.parent = x.parent
+
 	if x == x.parent.right {
 		x.parent.right = z
 	} else {
 		x.parent.left = z
 	}
+
 	z.right = x
 	x.parent = z
+
 	if z.extra == balanced {
 		x.extra, z.extra = leftHeavy, rightHeavy
 	} else {
@@ -359,23 +406,30 @@ func rotateRightLeft(x *node) {
 	z := x.right
 	y := z.left
 	z.left = y.right
+
 	if y.right != nil {
 		y.right.parent = z
 	}
+
 	y.right = z
 	z.parent = y
 	x.right = y.left
+
 	if y.left != nil {
 		y.left.parent = x
 	}
+
 	y.parent = x.parent
+
 	if x == x.parent.left {
 		x.parent.left = y
 	} else {
 		x.parent.right = y
 	}
+
 	y.left = x
 	x.parent = y
+
 	switch y.extra {
 	case rightHeavy:
 		x.extra, y.extra, z.extra = leftHeavy, balanced, balanced
@@ -390,23 +444,30 @@ func rotateLeftRight(x *node) {
 	z := x.left
 	y := z.right
 	z.right = y.left
+
 	if y.left != nil {
 		y.left.parent = z
 	}
+
 	y.left = z
 	z.parent = y
 	x.left = y.right
+
 	if y.right != nil {
 		y.right.parent = x
 	}
+
 	y.parent = x.parent
+
 	if x == x.parent.right {
 		x.parent.right = y
 	} else {
 		x.parent.left = y
 	}
+
 	y.right = x
 	x.parent = y
+
 	switch y.extra {
 	case leftHeavy:
 		x.extra, y.extra, z.extra = rightHeavy, balanced, balanced
@@ -423,6 +484,7 @@ func transplant(u *node, v *node) {
 	} else {
 		u.parent.right = v
 	}
+
 	if v != nil {
 		v.parent = u.parent
 	}
@@ -432,6 +494,7 @@ func minimum(x *node) *node {
 	for x.left != nil {
 		x = x.left
 	}
+
 	return x
 }
 
@@ -439,6 +502,7 @@ func maximum(x *node) *node {
 	for x.right != nil {
 		x = x.right
 	}
+
 	return x
 }
 
@@ -446,9 +510,11 @@ func successor(x *node) *node {
 	if x.right != nil {
 		return minimum(x.right)
 	}
+
 	for x == x.parent.right {
 		x = x.parent
 	}
+
 	return x.parent
 }
 
@@ -456,8 +522,10 @@ func predecessor(x *node) *node {
 	if x.left != nil {
 		return maximum(x.left)
 	}
+
 	for x == x.parent.left {
 		x = x.parent
 	}
+
 	return x.parent
 }

@@ -10,8 +10,10 @@ func AllOf(first, last iterators.InputIterator, pred func(types.Data) bool) bool
 		if !pred(first.Read()) {
 			return false
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return true
 }
 
@@ -20,8 +22,10 @@ func AnyOf(first, last iterators.InputIterator, pred func(types.Data) bool) bool
 		if pred(first.Read()) {
 			return true
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return false
 }
 
@@ -30,8 +34,10 @@ func NoneOf(first, last iterators.InputIterator, pred func(types.Data) bool) boo
 		if pred(first.Read()) {
 			return false
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return true
 }
 
@@ -47,8 +53,10 @@ func Find(first, last iterators.InputIterator, val types.Data) iterators.InputIt
 		if first.Read() == val {
 			return first
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return last
 }
 
@@ -57,8 +65,10 @@ func FindIf(first, last iterators.InputIterator, pred func(types.Data) bool) ite
 		if pred(first.Read()) {
 			return first
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return last
 }
 
@@ -67,8 +77,10 @@ func FindIfNot(first, last iterators.InputIterator, pred func(types.Data) bool) 
 		if !pred(first.Read()) {
 			return first
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return last
 }
 
@@ -77,8 +89,10 @@ func Count(first, last iterators.InputIterator, val types.Data) (count types.Siz
 		if first.Read() == val {
 			count++
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return count
 }
 
@@ -87,7 +101,9 @@ func CountIf(first, last iterators.InputIterator, pred func(types.Data) bool) (c
 		if pred(first.Read()) {
 			count++
 		}
+
 		first = first.Next().(iterators.InputIterator)
 	}
+
 	return count
 }

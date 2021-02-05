@@ -13,6 +13,7 @@ type Set struct {
 
 func New(keyComp constraints.LessThan) *Set {
 	valueComp := keyComp
+
 	return &Set{
 		base: base.New(valueComp),
 		comp: keyComp,
@@ -57,6 +58,7 @@ func (s *Set) Contains(k types.Data) bool {
 
 func (s *Set) EqualRange(k types.Data) (Iterator, Iterator) {
 	lb, ub := s.base.EqualRangeUnique(k)
+
 	return Iterator{base: lb}, Iterator{base: ub}
 }
 
@@ -74,6 +76,7 @@ func (s *Set) Clear() {
 
 func (s *Set) Insert(k types.Data) (Iterator, bool) {
 	it, ok := s.base.InsertUnique(k)
+
 	return Iterator{base: it}, ok
 }
 

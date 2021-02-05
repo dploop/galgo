@@ -15,16 +15,11 @@ type node struct {
 	data types.Data
 }
 
-func (l *List) assert(p *node) {
-	if p == &l.sentinel {
-		_ = *(*node)(nil)
-	}
-}
-
-func New() *List {
+func NewList() *List {
 	l := &List{}
 	l.sentinel.prev = &l.sentinel
 	l.sentinel.next = &l.sentinel
+
 	return l
 }
 
@@ -48,7 +43,6 @@ func (l *List) Front() types.Data {
 
 func (l *List) PopFront() {
 	p := l.sentinel.next
-	l.assert(p)
 	l.unlink(p, p)
 	l.size--
 }
@@ -65,7 +59,6 @@ func (l *List) Back() types.Data {
 
 func (l *List) PopBack() {
 	p := l.sentinel.prev
-	l.assert(p)
 	l.unlink(p, p)
 	l.size--
 }
@@ -96,15 +89,16 @@ func (l *List) Insert(i Iterator, data types.Data) Iterator {
 	p := &node{data: data}
 	l.link(i.n, p, p)
 	l.size++
+
 	return Iterator{n: p}
 }
 
 func (l *List) Erase(i Iterator) Iterator {
 	p := i.n
-	l.assert(p)
 	r := p.next
 	l.unlink(p, p)
 	l.size--
+
 	return Iterator{n: r}
 }
 

@@ -10,7 +10,7 @@ linters:
     - errcheck
     - errorlint
     - exhaustive
-    - exhaustivestruct
+    #- exhaustivestruct
     - exportloopref
     - forbidigo
     - funlen
@@ -66,3 +66,16 @@ linters:
     - whitespace
     - wrapcheck
     - wsl
+
+run:
+  tests: false
+
+linters-settings:
+  dupl:
+    threshold: 1000
+  funlen:
+    lines: 100
+  gocognit:
+    min-complexity: 100
+  nestif:
+    min-complexity: 100

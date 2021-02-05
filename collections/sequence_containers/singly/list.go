@@ -14,8 +14,9 @@ type node struct {
 	data types.Data
 }
 
-func New() *List {
+func NewList() *List {
 	l := &List{}
+
 	return l
 }
 
@@ -59,11 +60,13 @@ func (l *List) End() Iterator {
 func (l *List) InsertAfter(i Iterator, data types.Data) Iterator {
 	i.n.next = &node{next: i.n.next, data: data}
 	l.size++
+
 	return Iterator{n: i.n.next}
 }
 
 func (l *List) EraseAfter(i Iterator) Iterator {
 	i.n.next = i.n.next.next
 	l.size--
+
 	return Iterator{n: i.n.next}
 }

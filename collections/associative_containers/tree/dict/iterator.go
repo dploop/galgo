@@ -31,6 +31,7 @@ func (i Iterator) Next() constraints.Incrementable {
 
 func (i Iterator) ImplNext() Iterator {
 	i.base = i.base.ImplNext()
+
 	return i
 }
 
@@ -52,5 +53,6 @@ func (i Iterator) Prev() constraints.Decrementable {
 
 func (i Iterator) ImplPrev() Iterator {
 	i.base = i.base.ImplPrev()
+
 	return i
 }

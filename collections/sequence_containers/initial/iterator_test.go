@@ -1,9 +1,9 @@
-package singly_test
+package initial_test
 
 import (
 	"testing"
 
-	"github.com/dploop/gostl/collections/sequence_containers/singly"
+	"github.com/dploop/gostl/collections/sequence_containers/initial"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ func BenchmarkIterator_Write(b *testing.B) {
 
 func TestIterator_Clone(t *testing.T) {
 	i := newIterator()
-	j := i.Clone().(singly.Iterator)
+	j := i.Clone().(initial.Iterator)
 	assert.True(t, &i != &j)
 	assert.Equal(t, 0, i.Read())
 	assert.Equal(t, 0, j.Read())
@@ -58,14 +58,12 @@ func BenchmarkIterator_ImplClone(b *testing.B) {
 }
 
 func TestIterator_Next(t *testing.T) {
-	l := newList()
-	l.PushFront(2)
-	l.PushFront(1)
+	l := newList(1, 2)
 	i := l.Begin()
 	assert.Equal(t, 1, i.Read())
-	i = i.Next().(singly.Iterator)
+	i = i.Next().(initial.Iterator)
 	assert.Equal(t, 2, i.Read())
-	i = i.Next().(singly.Iterator)
+	i = i.Next().(initial.Iterator)
 	assert.Equal(t, l.End(), i)
 }
 
@@ -77,9 +75,7 @@ func BenchmarkIterator_Next(b *testing.B) {
 }
 
 func TestIterator_ImplNext(t *testing.T) {
-	l := newList()
-	l.PushFront(2)
-	l.PushFront(1)
+	l := newList(1, 2)
 	i := l.Begin()
 	assert.Equal(t, 1, i.Read())
 	i = i.ImplNext()

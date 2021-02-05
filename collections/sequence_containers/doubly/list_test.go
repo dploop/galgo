@@ -1,126 +1,96 @@
-package doubly
+package doubly_test
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewList(t *testing.T) {
-	l := New()
-	if l == nil {
-		t.Errorf("l(%v) == nil", l)
-	}
+	l := newList()
+	assert.NotNil(t, l)
 }
 
 func BenchmarkNewList(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		_ = New()
+		_ = newList()
 	}
 }
 
 func TestList_Size(t *testing.T) {
-	l := New()
-	if l.Size() != 0 {
-		t.Errorf("l(%v) is not 0 sized", l)
-	}
-	l.PushFront(42)
-	if l.Size() != 1 {
-		t.Errorf("l(%v) is not 1 sized", l)
-	}
+	l := newList()
+	assert.Equal(t, 0, l.Size())
+	l.PushFront(1)
+	assert.Equal(t, 1, l.Size())
 }
 
 func BenchmarkList_Size(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.Size()
 	}
 }
 
 func TestList_Empty(t *testing.T) {
-	l := New()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
-	l.PushFront(42)
-	if l.Empty() {
-		t.Errorf("l(%v) is empty", l)
-	}
+	l := newList()
+	assert.True(t, l.Empty())
+	l.PushFront(1)
+	assert.False(t, l.Empty())
 }
 
 func BenchmarkList_Empty(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.Empty()
 	}
 }
 
 func TestList_PushFront(t *testing.T) {
-	l := New()
-	l.PushFront(42)
-	data := l.Front().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	l := newList()
+	l.PushFront(1)
+	assert.Equal(t, 1, l.Front())
 }
 
 func BenchmarkList_PushFront(b *testing.B) {
-	loop := 1000000
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
-		if l.size == loop {
+		if l.Size() == 1000000 {
 			l.Clear()
 		}
-		l.PushFront(42)
+		l.PushFront(1)
 	}
 }
 
 func TestList_Front(t *testing.T) {
-	l := New()
-	l.PushFront(42)
-	data := l.Front().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	l := newList()
+	l.PushFront(1)
+	assert.Equal(t, 1, l.Front())
 }
 
 func BenchmarkList_Front(b *testing.B) {
-	l := New()
-	l.PushFront(42)
+	l := newList()
+	l.PushFront(1)
 	for n := 0; n < b.N; n++ {
 		_ = l.Front()
 	}
 }
 
 func TestList_PopFront(t *testing.T) {
-	defer func() {
-		if err := recover(); err == nil {
-			t.Errorf("failed to panic")
-		}
-	}()
-	l := New()
-	l.PushFront(42)
+	l := newList()
+	l.PushFront(1)
+	assert.False(t, l.Empty())
 	l.PopFront()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
-	l.PopFront()
+	assert.True(t, l.Empty())
 }
 
 func BenchmarkList_PopFront(b *testing.B) {
-	const loop = 1000000
-	var nodes [loop]node
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
-		if l.size == 0 {
+		if l.Size() == 0 {
 			b.StopTimer()
-			for k := 1; k < loop; k++ {
-				nodes[k-1].next = &nodes[k]
-				nodes[k].prev = &nodes[k-1]
+			for k := 1; k < 1000000; k++ {
+				l.PushFront(1)
 			}
-			l.sentinel.next = &nodes[0]
-			nodes[0].prev = &l.sentinel
-			l.sentinel.prev = &nodes[loop-1]
-			nodes[loop-1].next = &l.sentinel
-			l.size = loop
 			b.StartTimer()
 		}
 		l.PopFront()
@@ -128,67 +98,51 @@ func BenchmarkList_PopFront(b *testing.B) {
 }
 
 func TestList_PushBack(t *testing.T) {
-	l := New()
-	l.PushBack(42)
-	data := l.Back().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	l := newList()
+	l.PushBack(1)
+	assert.Equal(t, 1, l.Back())
 }
 
 func BenchmarkList_PushBack(b *testing.B) {
-	loop := 1000000
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
-		if l.size == loop {
+		if l.Size() == 1000000 {
 			l.Clear()
 		}
-		l.PushBack(42)
+		l.PushBack(1)
 	}
 }
 
 func TestList_Back(t *testing.T) {
-	l := New()
-	l.PushBack(42)
-	data := l.Back().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	l := newList()
+	l.PushBack(1)
+	assert.Equal(t, 1, l.Back())
 }
 
 func BenchmarkList_Back(b *testing.B) {
-	l := New()
-	l.PushBack(42)
+	l := newList()
+	l.PushBack(1)
 	for n := 0; n < b.N; n++ {
 		_ = l.Back()
 	}
 }
 
 func TestList_PopBack(t *testing.T) {
-	l := New()
-	l.PushBack(42)
+	l := newList()
+	l.PushBack(1)
+	assert.False(t, l.Empty())
 	l.PopBack()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
+	assert.True(t, l.Empty())
 }
 
 func BenchmarkList_PopBack(b *testing.B) {
-	const loop = 1000000
-	var nodes [loop]node
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
-		if l.size == 0 {
+		if l.Size() == 0 {
 			b.StopTimer()
-			for k := 1; k < loop; k++ {
-				nodes[k-1].next = &nodes[k]
-				nodes[k].prev = &nodes[k-1]
+			for k := 1; k < 1000000; k++ {
+				l.PushBack(1)
 			}
-			nodes[0].prev = &l.sentinel
-			l.sentinel.next = &nodes[0]
-			nodes[loop-1].next = &l.sentinel
-			l.sentinel.prev = &nodes[loop-1]
-			l.size = loop
 			b.StartTimer()
 		}
 		l.PopBack()
@@ -196,176 +150,124 @@ func BenchmarkList_PopBack(b *testing.B) {
 }
 
 func TestList_Clear(t *testing.T) {
-	l := New()
-	l.PushFront(42)
+	l := newList()
+	l.PushFront(1)
+	assert.False(t, l.Empty())
 	l.Clear()
-	if !l.Empty() {
-		t.Errorf("l(%v) is not empty", l)
-	}
+	assert.True(t, l.Empty())
 }
 
 func BenchmarkList_Clear(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		l.Clear()
 	}
 }
 
 func TestList_Begin(t *testing.T) {
-	l := New()
-	s := &l.sentinel
-	begin := l.Begin()
-	if begin.n != s {
-		t.Errorf("begin.n(%p) != s(%p)", begin.n, s)
-	}
-	l.PushFront(42)
-	begin = l.Begin()
-	if begin.n == s {
-		t.Errorf("begin.n(%p) == s(%p)", begin.n, s)
-	}
+	l := newList()
+	l.PushFront(1)
+	assert.Equal(t, 1, l.Begin().Read())
 }
 
 func BenchmarkList_Begin(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.Begin()
 	}
 }
 
 func TestList_End(t *testing.T) {
-	l := New()
-	s := &l.sentinel
-	end := l.End()
-	if end.n != s {
-		t.Errorf("end.n(%p) != s(%p)", end.n, s)
-	}
-	l.PushFront(42)
-	end = l.End()
-	if end.n != s {
-		t.Errorf("end.n(%p) != s(%p)", end.n, s)
-	}
+	l := newList()
+	l.PushFront(1)
+	end := l.Begin().ImplNext()
+	assert.True(t, l.End().Equal(end))
 }
 
 func BenchmarkList_End(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.End()
 	}
 }
 
 func TestList_ReverseBegin(t *testing.T) {
-	l := New()
-	s := &l.sentinel
-	rbegin := l.ReverseBegin()
-	if rbegin.n != s {
-		t.Errorf("rbegin.n(%p) != s(%p)", rbegin.n, s)
-	}
-	l.PushBack(42)
-	rbegin = l.ReverseBegin()
-	if rbegin.n == s {
-		t.Errorf("rbegin.n(%p) == s(%p)", rbegin.n, s)
-	}
+	l := newList()
+	l.PushBack(1)
+	assert.Equal(t, 1, l.ReverseBegin().Read())
 }
 
 func BenchmarkList_ReverseBegin(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.ReverseBegin()
 	}
 }
 
 func TestList_ReverseEnd(t *testing.T) {
-	l := New()
-	s := &l.sentinel
-	rend := l.ReverseEnd()
-	if rend.n != s {
-		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
-	}
-	l.PushBack(42)
-	rend = l.ReverseEnd()
-	if rend.n != s {
-		t.Errorf("rend.n(%p) != s(%p)", rend.n, s)
-	}
+	l := newList()
+	l.PushBack(1)
+	end := l.ReverseBegin().ImplPrev()
+	assert.True(t, l.ReverseEnd().Equal(end))
 }
 
 func BenchmarkList_ReverseEnd(b *testing.B) {
-	l := New()
+	l := newList()
 	for n := 0; n < b.N; n++ {
 		_ = l.ReverseEnd()
 	}
 }
 
 func TestList_Insert(t *testing.T) {
-	l := New()
-	l.PushBack(1)
-	i := l.ReverseBegin()
+	l := newList()
+	l.PushFront(1)
+	i := l.Begin()
 	j := l.Insert(i, 2)
 	k := l.Insert(j, 3)
-	di := i.Read().(int)
-	if di != 1 {
-		t.Errorf("di(%v) != 1", di)
-	}
-	dj := j.Read().(int)
-	if dj != 2 {
-		t.Errorf("dj(%v) != 2", dj)
-	}
-	dk := k.Read().(int)
-	if dk != 3 {
-		t.Errorf("dk(%v) != 1", dk)
-	}
+	assert.Equal(t, 1, i.Read())
+	assert.Equal(t, 2, j.Read())
+	assert.Equal(t, 3, k.Read())
 }
 
 func BenchmarkList_Insert(b *testing.B) {
-	loop := 1000000
-	l := New()
-	l.PushBack(42)
-	i := l.ReverseBegin()
+	l := newList()
+	l.PushFront(1)
+	i := l.Begin()
 	for n := 0; n < b.N; n++ {
-		if l.size == loop {
+		if l.Size() == 1000000 {
 			l.Clear()
-			l.PushBack(42)
-			i = l.ReverseBegin()
+			l.PushFront(1)
+			i = l.Begin()
 		}
-		_ = l.Insert(i, 42)
+		_ = l.Insert(i, 1)
 	}
 }
 
 func TestList_Erase(t *testing.T) {
-	l := New()
-	l.PushBack(3)
-	l.PushBack(2)
-	l.PushBack(1)
+	l := newList()
+	l.PushFront(3)
+	l.PushFront(2)
+	l.PushFront(1)
 	i := l.ReverseBegin()
 	_ = l.Erase(i)
-	if l.Size() != 2 {
-		t.Errorf("l(%v) is not 2 sized", l)
-	}
+	assert.Equal(t, 2, l.Size())
 	_ = l.Erase(i)
-	if l.Size() != 1 {
-		t.Errorf("l(%v) is not 1 sized", l)
-	}
+	assert.Equal(t, 1, l.Size())
 }
 
 func BenchmarkList_Erase(b *testing.B) {
-	const loop = 1000000
-	var nodes [loop]node
-	l := New()
+	l := newList()
 	i := l.ReverseBegin()
 	for n := 0; n < b.N; n++ {
-		if l.size <= 1 {
+		if l.Size() <= 1 {
 			b.StopTimer()
-			for k := 1; k < loop; k++ {
-				nodes[k-1].next = &nodes[k]
-				nodes[k].prev = &nodes[k-1]
+			for k := 1; k < 1000000; k++ {
+				l.PushBack(1)
 			}
-			nodes[loop-1].next = &l.sentinel
-			l.sentinel.prev = &nodes[loop-1]
-			nodes[0].prev = &l.sentinel
-			l.sentinel.next = &nodes[0]
-			l.size = loop
 			i = l.ReverseBegin()
 			b.StartTimer()
 		}
 		_ = l.Erase(i)
 	}
 }
+

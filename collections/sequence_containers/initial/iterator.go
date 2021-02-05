@@ -31,6 +31,7 @@ func (i Iterator) Next() constraints.Incrementable {
 
 func (i Iterator) ImplNext() Iterator {
 	i.n++
+
 	return i
 }
 

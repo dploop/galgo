@@ -1,400 +1,297 @@
-package vector
+package vector_test
 
 import (
-	"fmt"
-	"io/ioutil"
 	"testing"
+
+	"github.com/dploop/gostl/collections/sequence_containers/vector"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIterator_Write(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	i.Write(42)
-	data := i.Read().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	i := newIterator()
+	assert.Equal(t, 0, i.Read())
+	i.Write(1)
+	assert.Equal(t, 1, i.Read())
 }
 
 func BenchmarkIterator_Write(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i.Write(n)
+		i.Write(1)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.Read())
 }
 
 func TestIterator_Clone(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	j := i.Clone().(Iterator)
-	if &i == &j {
-		t.Errorf("&i(%p) == &j(%p)", &i, &j)
-	}
-	if i.l != j.l {
-		t.Errorf("i.l(%p) != j.l(%p)", i.l, j.l)
-	}
-	if i.n != j.n {
-		t.Errorf("i.n(%v) != j.n(%v)", i.n, j.n)
-	}
+	i := newIterator()
+	j := i.Clone().(vector.Iterator)
+	assert.True(t, &i != &j)
+	assert.Equal(t, 0, i.Read())
+	assert.Equal(t, 0, j.Read())
+	j.Write(1)
+	assert.Equal(t, 1, i.Read())
+	assert.Equal(t, 1, j.Read())
 }
 
 func BenchmarkIterator_Clone(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.Clone().(Iterator)
-		i.n++
+		_ = i.Clone()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_ImplClone(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	j := i.ImplClone()
-	if &i == &j {
-		t.Errorf("&i(%p) == &j(%p)", &i, &j)
-	}
-	if i.l != j.l {
-		t.Errorf("i.l(%p) != j.l(%p)", i.l, j.l)
-	}
-	if i.n != j.n {
-		t.Errorf("i.n(%v) != j.n(%v)", i.n, j.n)
-	}
+	assert.True(t, &i != &j)
+	assert.Equal(t, 0, i.Read())
+	assert.Equal(t, 0, j.Read())
+	j.Write(1)
+	assert.Equal(t, 1, i.Read())
+	assert.Equal(t, 1, j.Read())
 }
 
 func BenchmarkIterator_ImplClone(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.ImplClone()
-		i.n++
+		_ = i.ImplClone()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_Next(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
+	l.PushBack(2)
 	i := l.Begin()
-	i = i.Next().(Iterator)
-	if i.n != 1 {
-		t.Errorf("i.n(%v) != 1", i.n)
-	}
+	assert.Equal(t, 1, i.Read())
+	i = i.Next().(vector.Iterator)
+	assert.Equal(t, 2, i.Read())
+	i = i.Next().(vector.Iterator)
+	assert.Equal(t, l.End(), i)
 }
 
 func BenchmarkIterator_Next(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.Next().(Iterator)
+		_ = i.Next()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_ImplNext(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
+	l.PushBack(2)
 	i := l.Begin()
+	assert.Equal(t, 1, i.Read())
 	i = i.ImplNext()
-	if i.n != 1 {
-		t.Errorf("i.n(%v) != 1", i.n)
-	}
+	assert.Equal(t, 2, i.Read())
+	i = i.ImplNext()
+	assert.Equal(t, l.End(), i)
 }
 
 func BenchmarkIterator_ImplNext(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.ImplNext()
+		_ = i.ImplNext()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_Equal(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	j := l.Begin()
-	if !i.Equal(j) {
-		t.Errorf("i(%v) != j(%v)", i, j)
-	}
+	i := newIterator()
+	assert.True(t, i.Equal(i))
+	j := newIterator()
+	assert.False(t, i.Equal(j))
 }
 
 func BenchmarkIterator_Equal(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	j := l.Begin()
-	var tmp int
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		if i.Equal(j) {
-			tmp++
-		}
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.Equal(i)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_ImplEqual(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	j := l.Begin()
-	if !i.ImplEqual(j) {
-		t.Errorf("i(%v) != j(%v)", i, j)
-	}
+	i := newIterator()
+	assert.True(t, i.ImplEqual(i))
+	j := newIterator()
+	assert.False(t, i.ImplEqual(j))
 }
 
 func BenchmarkIterator_ImplEqual(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	j := l.Begin()
-	var tmp int
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		if i.Equal(j) {
-			tmp++
-		}
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.ImplEqual(i)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_Read(t *testing.T) {
-	l := NewList()
-	l.PushBack(42)
-	i := l.Begin()
-	data := i.Read().(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	i := newIterator()
+	i.Write(1)
+	assert.Equal(t, 1, i.Read())
 }
 
 func BenchmarkIterator_Read(b *testing.B) {
-	l := NewList()
-	l.PushBack(1)
-	i := l.Begin()
-	var tmp int
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		l.slice[0] = n
-		tmp = i.Read().(int)
+		_ = i.Read()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_Prev(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
-	i = i.Prev().(Iterator)
-	if i.n != -1 {
-		t.Errorf("i.n(%v) != -1", i.n)
-	}
+	l := newList()
+	l.PushBack(1)
+	l.PushBack(2)
+	i := l.ReverseBegin()
+	assert.Equal(t, 2, i.Read())
+	i = i.Prev().(vector.Iterator)
+	assert.Equal(t, 1, i.Read())
+	i = i.Prev().(vector.Iterator)
+	assert.Equal(t, l.ReverseEnd(), i)
 }
 
 func BenchmarkIterator_Prev(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.Prev().(Iterator)
+		_ = i.Prev()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_ImplPrev(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	l := newList()
+	l.PushBack(1)
+	l.PushBack(2)
+	i := l.ReverseBegin()
+	assert.Equal(t, 2, i.Read())
 	i = i.ImplPrev()
-	if i.n != -1 {
-		t.Errorf("i.n(%v) != -1", i.n)
-	}
+	assert.Equal(t, 1, i.Read())
+	i = i.ImplPrev()
+	assert.Equal(t, l.ReverseEnd(), i)
 }
 
 func BenchmarkIterator_ImplPrev(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
-	i := l.Begin()
+	i := newIterator()
 	for n := 0; n < b.N; n++ {
-		i = i.ImplPrev()
+		_ = i.ImplPrev()
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_Less(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	if !i.Less(j) {
-		t.Errorf("i(%v) should be less than j(%v)", i, j)
-	}
+	assert.True(t, i.Less(j))
 }
 
 func BenchmarkIterator_Less(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	var tmp int
 	for n := 0; n < b.N; n++ {
-		if i.Less(j) {
-			tmp++
-		}
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.Less(j)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_ImplLess(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	if !i.ImplLess(j) {
-		t.Errorf("i(%v) should be less than j(%v)", i, j)
-	}
+	assert.True(t, i.ImplLess(j))
 }
 
 func BenchmarkIterator_ImplLess(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	var tmp int
 	for n := 0; n < b.N; n++ {
-		if i.ImplLess(j) {
-			tmp++
-		}
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.ImplLess(j)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_At(t *testing.T) {
-	l := NewList()
-	l.PushBack(42)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
-	data := i.At(0).(int)
-	if data != 42 {
-		t.Errorf("data(%v) != 42", data)
-	}
+	assert.Equal(t, 1, i.At(0))
 }
 
 func BenchmarkIterator_At(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
-	var tmp int
 	for n := 0; n < b.N; n++ {
-		l.slice[0] = n
-		tmp = i.At(0).(int)
+		_ = i.At(0)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_Advance(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
-	i = i.Advance(1).(Iterator)
-	if i.n != 1 {
-		t.Errorf("i.n(%v) != 1", i.n)
-	}
+	j := i.Advance(1).(vector.Iterator)
+	assert.True(t, j.Equal(l.End()))
 }
 
 func BenchmarkIterator_Advance(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	for n := 0; n < b.N; n++ {
-		i = i.Advance(1).(Iterator)
+		_ = i.Advance(1).(vector.Iterator)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_ImplAdvance(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
-	i = i.ImplAdvance(1)
-	if i.n != 1 {
-		t.Errorf("i.n(%v) != 1", i.n)
-	}
+	j := i.ImplAdvance(1)
+	assert.True(t, j.Equal(l.End()))
 }
 
 func BenchmarkIterator_ImplAdvance(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	for n := 0; n < b.N; n++ {
-		i = i.ImplAdvance(1)
+		_ = i.ImplAdvance(1)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, i.n)
 }
 
 func TestIterator_Distance(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	dist := i.Distance(j)
-	if dist != 1 {
-		t.Errorf("dist(%v) != 1", dist)
-	}
+	assert.Equal(t, 1, i.Distance(j))
 }
 
 func BenchmarkIterator_Distance(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	var tmp int
 	for n := 0; n < b.N; n++ {
-		tmp += i.Distance(j)
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.Distance(j)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }
 
 func TestIterator_ImplDistance(t *testing.T) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	dist := i.ImplDistance(j)
-	if dist != 1 {
-		t.Errorf("dist(%v) != 1", dist)
-	}
+	assert.Equal(t, 1, i.ImplDistance(j))
 }
 
 func BenchmarkIterator_ImplDistance(b *testing.B) {
-	l := NewList()
-	l.PushBack(0)
+	l := newList()
+	l.PushBack(1)
 	i := l.Begin()
 	j := l.End()
-	var tmp int
 	for n := 0; n < b.N; n++ {
-		tmp += i.ImplDistance(j)
-		i.n = (i.n + n) % 2
-		j.n = (j.n + n) % 3
+		_ = i.ImplDistance(j)
 	}
-	_, _ = fmt.Fprint(ioutil.Discard, tmp)
 }

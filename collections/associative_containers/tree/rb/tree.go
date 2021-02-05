@@ -28,6 +28,7 @@ type node struct {
 func New(comp constraints.LessThan) *Tree {
 	t := &Tree{comp: comp}
 	t.start = &t.sentinel
+
 	return t
 }
 
@@ -60,6 +61,7 @@ func (t *Tree) CountUnique(data types.Data) types.Size {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return 1
 	}
+
 	return 0
 }
 
@@ -67,8 +69,10 @@ func (t *Tree) CountMulti(data types.Data) (c types.Size) {
 	x, y := t.LowerBound(data), t.UpperBound(data)
 	for x != y {
 		c++
+
 		x = x.ImplNext()
 	}
+
 	return c
 }
 
@@ -77,6 +81,7 @@ func (t *Tree) Find(data types.Data) Iterator {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return x
 	}
+
 	return t.End()
 }
 
@@ -85,6 +90,7 @@ func (t *Tree) Contains(data types.Data) bool {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return true
 	}
+
 	return false
 }
 
@@ -93,6 +99,7 @@ func (t *Tree) EqualRangeUnique(data types.Data) (Iterator, Iterator) {
 	if x != t.End() && !t.comp(data, x.Read()) {
 		return x, x.ImplNext()
 	}
+
 	return x, x
 }
 
@@ -106,6 +113,7 @@ func (t *Tree) LowerBound(data types.Data) Iterator {
 
 func (t *Tree) lowerBound(data types.Data) *node {
 	x := &t.sentinel
+
 	for y := x.left; y != nil; {
 		if !t.comp(y.data, data) {
 			x = y
@@ -114,6 +122,7 @@ func (t *Tree) lowerBound(data types.Data) *node {
 			y = y.right
 		}
 	}
+
 	return x
 }
 
@@ -123,6 +132,7 @@ func (t *Tree) UpperBound(data types.Data) Iterator {
 
 func (t *Tree) upperBound(data types.Data) *node {
 	x := &t.sentinel
+
 	for y := x.left; y != nil; {
 		if t.comp(data, y.data) {
 			x = y
@@ -131,6 +141,7 @@ func (t *Tree) upperBound(data types.Data) *node {
 			y = y.right
 		}
 	}
+
 	return x
 }
 
@@ -145,20 +156,24 @@ func (t *Tree) InsertUnique(v types.Data) (Iterator, bool) {
 	if lb != t.End() && !t.comp(v, lb.Read()) {
 		return t.End(), false
 	}
+
 	z := &node{data: v}
 	t.insert(z)
+
 	return Iterator{n: z}, true
 }
 
 func (t *Tree) InsertMulti(v types.Data) Iterator {
 	z := &node{data: v}
 	t.insert(z)
+
 	return Iterator{n: z}
 }
 
 func (t *Tree) Delete(i Iterator) Iterator {
 	r := i.ImplNext()
 	t.delete(i.n)
+
 	return r
 }
 
@@ -168,6 +183,7 @@ func transplant(u *node, v *node) {
 	} else {
 		u.parent.right = v
 	}
+
 	if v != nil {
 		v.parent = u.parent
 	}
@@ -177,6 +193,7 @@ func minimum(x *node) *node {
 	for x.left != nil {
 		x = x.left
 	}
+
 	return x
 }
 
@@ -184,6 +201,7 @@ func maximum(x *node) *node {
 	for x.right != nil {
 		x = x.right
 	}
+
 	return x
 }
 
@@ -191,9 +209,11 @@ func successor(x *node) *node {
 	if x.right != nil {
 		return minimum(x.right)
 	}
+
 	for x == x.parent.right {
 		x = x.parent
 	}
+
 	return x.parent
 }
 
@@ -201,9 +221,11 @@ func predecessor(x *node) *node {
 	if x.left != nil {
 		return maximum(x.left)
 	}
+
 	for x == x.parent.left {
 		x = x.parent
 	}
+
 	return x.parent
 }
 
@@ -211,6 +233,7 @@ func (t *Tree) insert(z *node) {
 	z.parent = nil
 	z.left, z.right, z.extra = nil, nil, red
 	x, childIsLeft := &t.sentinel, true
+
 	for y := x.left; y != nil; {
 		x, childIsLeft = y, t.comp(z.data, y.data)
 		if childIsLeft {
@@ -219,15 +242,19 @@ func (t *Tree) insert(z *node) {
 			y = y.right
 		}
 	}
+
 	z.parent = x
+
 	if childIsLeft {
 		x.left = z
 	} else {
 		x.right = z
 	}
+
 	if t.start.left != nil {
 		t.start = t.start.left
 	}
+
 	t.balanceAfterInsert(x, z)
 	t.size++
 }
@@ -274,6 +301,7 @@ func (t *Tree) balanceAfterInsert(x *node, z *node) {
 			}
 		}
 	}
+
 	t.sentinel.left.extra = black
 }
 
@@ -281,8 +309,11 @@ func (t *Tree) delete(z *node) {
 	if t.start == z {
 		t.start = successor(z)
 	}
+
 	x, deletedColor := z.parent, z.extra
+
 	var n *node
+
 	switch {
 	case z.left == nil:
 		n = z.right
@@ -294,20 +325,24 @@ func (t *Tree) delete(z *node) {
 		y := minimum(z.right)
 		x, deletedColor = y, y.extra
 		n = y.right
+
 		if y.parent != z {
 			x = y.parent
 			transplant(y, n)
 			y.right = z.right
 			y.right.parent = y
 		}
+
 		transplant(z, y)
 		y.left = z.left
 		y.left.parent = y
 		y.extra = z.extra
 	}
+
 	if deletedColor == black {
 		t.balanceAfterDelete(x, n)
 	}
+
 	t.size--
 }
 
@@ -321,6 +356,7 @@ func (t *Tree) balanceAfterDelete(x *node, n *node) {
 				rotateLeft(x)
 				z = x.right
 			}
+
 			if isBlack(z.left) && isBlack(z.right) {
 				z.extra = red
 				n = x
@@ -363,6 +399,7 @@ func (t *Tree) balanceAfterDelete(x *node, n *node) {
 			}
 		}
 	}
+
 	if isRed(n) {
 		n.extra = black
 	}
@@ -371,15 +408,19 @@ func (t *Tree) balanceAfterDelete(x *node, n *node) {
 func rotateLeft(x *node) {
 	y := x.right
 	x.right = y.left
+
 	if x.right != nil {
 		x.right.parent = x
 	}
+
 	y.parent = x.parent
+
 	if x == x.parent.left {
 		x.parent.left = y
 	} else {
 		x.parent.right = y
 	}
+
 	y.left = x
 	x.parent = y
 }
@@ -387,15 +428,19 @@ func rotateLeft(x *node) {
 func rotateRight(x *node) {
 	y := x.left
 	x.left = y.right
+
 	if x.left != nil {
 		x.left.parent = x
 	}
+
 	y.parent = x.parent
+
 	if x == x.parent.right {
 		x.parent.right = y
 	} else {
 		x.parent.left = y
 	}
+
 	y.right = x
 	x.parent = y
 }

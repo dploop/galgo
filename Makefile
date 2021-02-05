@@ -6,6 +6,9 @@ cover:
 
 bench: bench_singly bench_doubly bench_vector
 
+bench_initial:
+	go test -v  -bench . -run ^$$ ./collections/sequence_containers/initial/...
+
 bench_singly:
 	go test -v  -bench . -run ^$$ ./collections/sequence_containers/singly/...
 

@@ -31,6 +31,7 @@ func (i Iterator) Next() constraints.Incrementable {
 
 func (i Iterator) ImplNext() Iterator {
 	i.n++
+
 	return i
 }
 
@@ -52,6 +53,7 @@ func (i Iterator) Prev() constraints.Decrementable {
 
 func (i Iterator) ImplPrev() Iterator {
 	i.n--
+
 	return i
 }
 
@@ -73,6 +75,7 @@ func (i Iterator) Advance(diff types.Size) iterators.RandomAccessIterator {
 
 func (i Iterator) ImplAdvance(diff types.Size) Iterator {
 	i.n += diff
+
 	return i
 }
 
