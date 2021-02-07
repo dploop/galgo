@@ -13,10 +13,6 @@ type Iterator struct {
 	n types.Size
 }
 
-func (i Iterator) Write(data types.Data) {
-	i.l.slice[i.n] = data
-}
-
 func (i Iterator) Clone() constraints.Cloneable {
 	return i.ImplClone()
 }

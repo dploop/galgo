@@ -4,7 +4,7 @@ test:
 cover:
 	go tool cover -html=coverage.out
 
-bench: bench_singly bench_doubly bench_vector
+bench: bench_initial bench_singly bench_doubly bench_vector
 
 bench_initial:
 	go test -v  -bench . -run ^$$ ./collections/sequence_containers/initial/...
